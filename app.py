@@ -35,34 +35,8 @@ def after_request(response):
 @app.route("/")
 @login_required
 def index():
-    """Show portfolio of stocks"""
-    all_stocks = []
-    stocks = db.execute(
-        "SELECT stock, shares FROM portfolio where user_id = ?", session["user_id"])
-    print(stocks)
-    total_price = 0
-    for stock in stocks:
-        # if stock row has no stock value skip
-        if stock.get("stock") is None:
-            continue
-        price = float(lookup(stock["stock"])["price"])
-        total_price += price * stock["shares"]
-        all_stocks.append({"stock": stock["stock"], "shares": stock["shares"], "price": inr(
-            price), "total_price": inr(price * stock["shares"])})
-
-    cash_row = db.execute("select cash from users where id = ?", session["user_id"])
-    cash = float(cash_row[0]["cash"]) if cash_row else 0.0
-    total_worth = total_price + cash
-    print(all_stocks)
-    return render_template("index.html", stocks=all_stocks, cash=inr(cash), total=inr(total_worth))
-
-
-@app.route("/history")
-@login_required
-def history():
-    """Show history of transactions"""
-    transactions = db.execute("SELECT * from transactions where user_id = ?", session["user_id"])
-    return render_template("history.html", transactions=transactions)
+ 
+    return render_template("index.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
