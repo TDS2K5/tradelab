@@ -57,48 +57,6 @@ def index():
     return render_template("index.html", stocks=all_stocks, cash=inr(cash), total=inr(total_worth))
 
 
-@app.route("/buy", methods=["POST"])
-@login_required
-def buy():
-    """Buy shares of stock"""
-    if not request.form.get("symbol"):
-        return apology("must provide symbol", 403)
-
-    # Ensure password was submitted
-    elif not request.form.get("shares"):
-        return apology("must provide shares", 403)
-
-    symbol = request.form.get("symbol")
-    stock = lookup(symbol)
-    if not stock:
-        return apology("Stock not found")
-    try:
-        shares = int(request.form.get("shares"))
-    except ValueError:
-        return apology("Please provide numeric share value", 400)
-    else:
-        if shares < 1:
-            return apology("Please enter a valid shares value", 400)
-
-    balance_row = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
-    balance = balance_row[0] if balance_row else {"cash": 0}
-
-    if float(balance["cash"]) < float(stock["price"]) * shares:
-        return apology("You don't have enough balance")
-
-    # check if it already exists
-    if len(db.execute("select * from portfolio where stock = ?", symbol)) != 0:
-        db.execute("update portfolio set shares = shares + ? where stock = ?", shares, symbol)
-    else:
-        db.execute("INSERT INTO portfolio values (?, ?, ?)", session["user_id"], symbol, shares)
-
-    db.execute("INSERT INTO transactions values (?, ?, ?, datetime('now'), ?)",
-                session["user_id"], symbol, f"+{shares}", inr(float(stock["price"])))
-    db.execute("update users set cash = cash - ? where id = ?",
-                float(stock["price"]) * float(shares), session["user_id"])
-    return redirect("/")
-
-
 @app.route("/history")
 @login_required
 def history():
@@ -227,49 +185,3 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
-def sell():
-    """Sell shares of stock"""
-    stocks = db.execute("SELECT * FROM portfolio where user_id = ?", session["user_id"])
-    symbols = []
-
-    if len(stocks) != 0:
-        for stock in stocks:
-            symbols.append(stock["stock"])
-
-    if request.method == "POST":
-        if not request.form.get("symbol"):
-            return apology("must provide symbol", 403)
-
-        elif not request.form.get("shares"):
-            return apology("must provide shares", 403)
-
-        symbol = request.form.get("symbol")
-        stock = lookup(symbol)
-
-        current_stock = db.execute("SELECT * FROM portfolio where stock = ?", symbol)
-
-        try:
-            shares = int(request.form.get("shares"))
-        except ValueError:
-            return apology("Please provide numeric share value", 400)
-        else:
-            if shares < 1:
-                return apology("Please enter a valid shares value", 400)
-            elif shares > current_stock[0]["shares"]:
-                return apology("Please enter a valid shares value", 400)
-
-        if current_stock[0]["shares"] - shares == 0:
-            db.execute("delete from portfolio where stock = ? ", symbol)
-        else:
-            db.execute("update portfolio set shares = shares - ? where user_id = ? and stock = ?",
-                       shares, session["user_id"], symbol)
-
-        db.execute("INSERT INTO transactions values (?, ?, ?, datetime('now'), ?)",
-                   session["user_id"], symbol, f"-{shares}", inr(float(stock["price"])))
-        db.execute("update users set cash = cash + ? where id = ?",
-                   float(stock["price"]) * shares, session["user_id"])
-        return redirect("/")
-
-    return render_template("sell.html", symbols=symbols)
