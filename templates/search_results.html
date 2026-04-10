@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Search Stocks
+{% endblock %}
+
+{% block main %}
+    <h1>Search Results</h1>
+    <ul class="list-group" style="width: fit-content; margin: auto;">
+    {% for stock in stocks %}
+        <li class="list-group-item d-flex justify-content-between align-items-center gap-3">
+            <span>{{stock.name}} - <b>{{stock.price | inr }}</b></span>
+            <a class="btn btn-primary" href="/quote/{{stock.symbol}}">View</a>
+        </li>
+    </form>
+    {% else %}
+        <li>No results found.</li>
+    {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quoted
+{% endblock %}
+
+{% block main %}
+    <div class="row" style="display: flex; justify-content: space-between;">
+        <div class="col-md justify-content-center justify-content-md-start align-items-start gap-2 text-center text-md-start">
+            <span>{{ stock.exchange }}</span>
+            <div style="display: flex; margin-bottom: 1rem;" class="justify-content-center justify-content-md-start">
+                <h2 style="width: max-content;">{{stock.name}}</h2>
+                <span>{{ stock.symbol | strip_suffix }}</span>
+                <a href="{{ stock.website }}" class="ms-2"><svg xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: 24px;" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 3h-6.75M21 3v6.75M21 3l-8.25 8.25M9.4 3c-2.24 0-3.36 0-4.216.436a4 4 0 0 0-1.748 1.748C3 6.04 3 7.16 3 9.4v5.2c0 2.24 0 3.36.436 4.216a4 4 0 0 0 1.748 1.748C6.04 21 7.16 21 9.4 21h5.2c2.24 0 3.36 0 4.216-.436a4 4 0 0 0 1.748-1.748C21 17.96 21 16.84 21 14.6v-1.1"/></svg></a>
+            </div>
+            <h4>
+                {{value}}
+            </h4>
+            <div class="d-grid">
+                <span>Sector: <b>{{ stock.sector }}</b></span>
+                <span>Industry: <b>{{ stock.industry }}</b></span>
+            </div>
+            <span>Summary:</span>
+            <p style="line-height: 1.2; font-size: 0.9rem;">{{ stock.summary }}</p>
+        </div>
+        <form action="/buy" method="post" class="col-md d-grid align-content-start gap-3 justify-content-center justify-content-md-end align-items-start">
+            <div class="d-flex gap-3">
+                <div class="hidden">
+                    <input autocomplete="off" autofocus="" hidden value={{stock.symbol}} name="symbol" placeholder="Symbol" type="text">
+                </div>
+                <div class="">
+                    <input autocomplete="off" class="form-control mx-auto w-auto" min="1" name="shares" placeholder="Shares" type="number">
+                </div>
+                <button class="btn btn-primary" type="submit">Buy</button>
+            </div>
+            <div class="d-grid gap-3 text-start text-md-end">
+                <span>Company Officers</span>
+                {% for officer in stock.officers[:5]  %}
+                <div class="">
+                    <div class="">
+                        <h5>{{ officer.name }}</h5>
+                        <span>{{ officer.title }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
