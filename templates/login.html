@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block main %}
+    <div class="tl-auth-container">
+        <h2>Welcome back</h2>
+        <p class="tl-auth-sub">Sign in to your TradeLab account</p>
+
+        <div class="tl-card">
+            <form action="/login" method="post">
+                <div class="tl-form-group">
+                    <label class="tl-label" for="login-username">Username</label>
+                    <input autocomplete="off" autofocus class="tl-input" id="login-username" name="username" placeholder="Enter your username" type="text">
+                </div>
+                <div class="tl-form-group">
+                    <label class="tl-label" for="login-password">Password</label>
+                    <input class="tl-input" id="login-password" name="password" placeholder="Enter your password" type="password">
+                </div>
+                <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span>Log In</span><div class="tl-btn-glint"></div></button>
+            </form>
+        </div>
+
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: #888;">
+            Don't have an account? <a href="/register">Register</a>
+        </p>
+    </div>
+{% endblock %}

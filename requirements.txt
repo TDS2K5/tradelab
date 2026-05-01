@@ -1,0 +1,7 @@
+Flask
+Flask-Session
+pytz
+requests
+yfinance
+growwapi
+pandas

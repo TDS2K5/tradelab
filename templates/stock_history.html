@@ -1,0 +1,201 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ data.symbol | strip_suffix }} — Historical Data{% endblock %}
+
+{% block main %}
+<div style="max-width: 100%;">
+    <!-- Header -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 0.75rem;">
+        <div>
+            <h1 style="margin-bottom: 0.15rem;">{{ stock_name }}</h1>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="color: #888; font-size: 0.88rem;">{{ data.symbol | strip_suffix }}</span>
+                <span class="tl-badge tl-badge-gray">{{ data.total_records }} trading days</span>
+            </div>
+        </div>
+        <a href="/quote/{{ data.symbol }}" class="tl-btn tl-btn-outline tl-btn-sm"><span>← Back to Quote</span><div class="tl-btn-glint"></div></a>
+    </div>
+
+    <!-- Period Filter -->
+    <div class="tl-card" style="margin-bottom: 1.25rem;">
+        <h4 style="margin-bottom: 0.75rem;">Time Period</h4>
+        <div class="tl-period-bar">
+            {% set periods = [('1mo', '1M'), ('3mo', '3M'), ('6mo', '6M'), ('1y', '1Y'), ('2y', '2Y'), ('5y', '5Y'), ('max', 'Max')] %}
+            {% for p_val, p_label in periods %}
+            <a href="/stockhistory/{{ data.symbol }}?period={{ p_val }}"
+               class="tl-period-btn {{ 'active' if period == p_val and not start_date else '' }}">
+                {{ p_label }}
+            </a>
+            {% endfor %}
+        </div>
+        <form action="/stockhistory/{{ data.symbol }}" method="get" style="display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: flex-end;">
+            <div>
+                <label class="tl-label" for="hist-start">Start</label>
+                <input type="date" class="tl-input" id="hist-start" name="start" value="{{ start_date }}" style="width: auto;">
+            </div>
+            <div>
+                <label class="tl-label" for="hist-end">End</label>
+                <input type="date" class="tl-input" id="hist-end" name="end" value="{{ end_date }}" style="width: auto;">
+            </div>
+            <div>
+                <button type="submit" class="tl-btn tl-btn-primary tl-btn-sm"><span>Apply</span><div class="tl-btn-glint"></div></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Chart -->
+    <div class="tl-card" style="margin-bottom: 1.25rem;">
+        <h4 style="margin-bottom: 0.5rem;">Price Chart</h4>
+        <div class="tl-chart-wrap">
+            <canvas id="priceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="tl-card" style="padding: 0; overflow: hidden;">
+        <div style="overflow-x: auto;">
+            <table class="tl-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th style="text-align: left;">Date</th>
+                        <th style="text-align: right;">Open</th>
+                        <th style="text-align: right;">High</th>
+                        <th style="text-align: right;">Low</th>
+                        <th style="text-align: right;">Close</th>
+                        <th style="text-align: right;">Volume</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in data.records %}
+                    <tr>
+                        <td style="text-align: left;">{{ record.date }}</td>
+                        <td style="text-align: right;">{{ record.open | inr }}</td>
+                        <td style="text-align: right;" class="tl-green">{{ record.high | inr }}</td>
+                        <td style="text-align: right;" class="tl-red">{{ record.low | inr }}</td>
+                        <td style="text-align: right; font-weight: 500;">{{ record.close | inr }}</td>
+                        <td style="text-align: right;">{{ "{:,}".format(record.volume) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+(function() {
+    const records = {{ data.records | tojson }};
+    const labels = records.map(r => r.date);
+    const closes = records.map(r => r.close);
+    const highs = records.map(r => r.high);
+    const lows = records.map(r => r.low);
+
+    // Determine color: green if last close >= first close, else red
+    const isUp = closes[closes.length - 1] >= closes[0];
+    const trendColor = isUp ? '#059669' : '#dc2626';
+    const trendBg = isUp ? 'rgba(5, 150, 105, 0.08)' : 'rgba(220, 38, 38, 0.08)';
+
+    const ctx = document.getElementById('priceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Close',
+                    data: closes,
+                    borderColor: trendColor,
+                    backgroundColor: trendBg,
+                    borderWidth: 1.5,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: records.length > 60 ? 0 : 2,
+                    pointHoverRadius: 4,
+                },
+                {
+                    label: 'High',
+                    data: highs,
+                    borderColor: 'rgba(5, 150, 105, 0.2)',
+                    borderWidth: 1,
+                    borderDash: [4, 4],
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 0,
+                },
+                {
+                    label: 'Low',
+                    data: lows,
+                    borderColor: 'rgba(220, 38, 38, 0.2)',
+                    borderWidth: 1,
+                    borderDash: [4, 4],
+                    fill: false,
+                    tension: 0.3,
+                    pointRadius: 0,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { family: 'Inter', size: 12 },
+                        usePointStyle: true,
+                        pointStyle: 'line',
+                        padding: 16,
+                    }
+                },
+                tooltip: {
+                    backgroundColor: '#fff',
+                    titleColor: '#111',
+                    bodyColor: '#555',
+                    borderColor: '#e8e8e8',
+                    borderWidth: 1,
+                    padding: 10,
+                    titleFont: { family: 'Inter', weight: '600' },
+                    bodyFont: { family: 'Inter' },
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN', {minimumFractionDigits: 2});
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        maxTicksLimit: 10,
+                        maxRotation: 0,
+                        font: { family: 'Inter', size: 11 },
+                        color: '#aaa',
+                    },
+                    grid: {
+                        display: false,
+                    }
+                },
+                y: {
+                    ticks: {
+                        font: { family: 'Inter', size: 11 },
+                        color: '#aaa',
+                        callback: function(value) {
+                            return '₹' + value.toLocaleString('en-IN');
+                        }
+                    },
+                    grid: {
+                        color: '#f0f0f0',
+                    }
+                }
+            }
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block main %}
+    <div class="tl-auth-container">
+        <h2>Create an account</h2>
+        <p class="tl-auth-sub">Start trading on TradeLab</p>
+
+        <div class="tl-card">
+            <form action="/register" method="post">
+                <div class="tl-form-group">
+                    <label class="tl-label" for="reg-username">Username</label>
+                    <input autocomplete="off" autofocus class="tl-input" id="reg-username" name="username" placeholder="Choose a username" type="text">
+                </div>
+                <div class="tl-form-group">
+                    <label class="tl-label" for="reg-password">Password</label>
+                    <input class="tl-input" id="reg-password" name="password" placeholder="Create a password" type="password">
+                </div>
+                <div class="tl-form-group">
+                    <label class="tl-label" for="reg-confirm">Confirm Password</label>
+                    <input class="tl-input" id="reg-confirm" name="confirmation" placeholder="Re-enter your password" type="password">
+                </div>
+                <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span>Register</span><div class="tl-btn-glint"></div></button>
+            </form>
+        </div>
+
+        <p style="text-align: center; margin-top: 1rem; font-size: 0.85rem; color: #888;">
+            Already have an account? <a href="/login">Log In</a>
+        </p>
+    </div>
+{% endblock %}

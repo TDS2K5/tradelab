@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ stock.name }}{% endblock %}
+
+{% block main %}
+    <div class="tl-quote-grid">
+        <!-- Left: Stock Info -->
+        <div>
+            <div style="margin-bottom: 0.4rem;">
+                <span class="tl-badge tl-badge-gray">{{ stock.exchange }}</span>
+            </div>
+
+            <div style="display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;">
+                <h1 style="margin: 0;">{{ stock.name }}</h1>
+                <span style="color: #888; font-size: 0.9rem;">{{ stock.symbol | strip_suffix }}</span>
+                {% if stock.website %}
+                <a href="{{ stock.website }}" target="_blank" rel="noopener" style="color: #888; display: inline-flex; align-items: center;" title="Company website">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                {% endif %}
+            </div>
+
+            <div class="tl-price-large">{{ value }}</div>
+
+            <div class="tl-meta-row">
+                {% if stock.sector %}
+                <span class="tl-badge tl-badge-blue">{{ stock.sector }}</span>
+                {% endif %}
+                {% if stock.industry %}
+                <span class="tl-badge tl-badge-gray">{{ stock.industry }}</span>
+                {% endif %}
+            </div>
+
+            {% if stock.summary %}
+            <hr class="tl-divider">
+            <h4>About</h4>
+            <p class="tl-summary">{{ stock.summary }}</p>
+            {% endif %}
+
+            <a href="/stockhistory/{{ stock.symbol }}" class="tl-btn tl-btn-outline tl-btn-sm" style="margin-top: 0.75rem;"><span>View Historical Data →</span><div class="tl-btn-glint"></div></a>
+
+            {% if stock.officers %}
+            <hr class="tl-divider">
+            <h4>Key People</h4>
+            {% for officer in stock.officers[:5] %}
+            <div class="tl-officer">
+                <div class="tl-officer-name">{{ officer.name }}</div>
+                <div class="tl-officer-title">{{ officer.title }}</div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Right: Buy Action -->
+        <div>
+            <div class="tl-card tl-action-card">
+                <h4 style="margin-bottom: 1rem;">Buy {{ stock.symbol | strip_suffix }}</h4>
+                <form action="/buy" method="post">
+                    <input type="hidden" value="{{ stock.symbol }}" name="symbol">
+                    <div class="tl-form-group">
+                        <label class="tl-label" for="buy-shares">Number of shares</label>
+                        <input autocomplete="off" class="tl-input" id="buy-shares" min="1" name="shares" placeholder="e.g. 10" type="number">
+                    </div>
+                    <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span>Buy</span><div class="tl-btn-glint"></div></button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

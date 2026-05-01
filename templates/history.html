@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+
+{% block title %}History{% endblock %}
+
+{% block main %}
+    <div class="tl-page-header">
+        <h1>Transaction History</h1>
+        <p>A record of all your trades</p>
+    </div>
+
+    {% if transactions %}
+    <div class="tl-card" style="padding: 0; overflow: hidden;">
+        <table class="tl-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Symbol</th>
+                    <th style="text-align: right;">Shares</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: right;">Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for t in transactions %}
+                <tr>
+                    <td style="text-align: left; font-weight: 500;">{{ t.stock | strip_suffix }}</td>
+                    <td style="text-align: right;">
+                        {% if t.shares | string | first == '+' %}
+                            <span class="tl-badge tl-badge-green">{{ t.shares }}</span>
+                        {% else %}
+                            <span class="tl-badge tl-badge-red">{{ t.shares }}</span>
+                        {% endif %}
+                    </td>
+                    <td style="text-align: right;">{{ t.price }}</td>
+                    <td style="text-align: right; color: #888;">{{ t.time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="tl-card tl-empty">
+        <div class="tl-empty-icon">📋</div>
+        <p>No transactions yet.</p>
+    </div>
+    {% endif %}
+{% endblock %}

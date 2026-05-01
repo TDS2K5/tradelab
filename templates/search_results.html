@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block main %}
+    <div class="tl-page-header">
+        <h1>Search Results</h1>
+    </div>
+
+    <div class="tl-results-grid">
+        {% for stock in stocks %}
+        <div class="tl-result-item">
+            <div>
+                <span class="tl-result-name">{{ stock.name }}</span>
+                <span class="tl-result-price">{{ stock.price | inr }}</span>
+            </div>
+            <a class="tl-btn tl-btn-outline tl-btn-sm" href="/quote/{{ stock.symbol }}"><span>View</span><div class="tl-btn-glint"></div></a>
+        </div>
+        {% else %}
+        <div class="tl-card tl-empty">
+            <p>No results found. Try a different search term.</p>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

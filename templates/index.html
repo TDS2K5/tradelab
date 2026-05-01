@@ -1,0 +1,54 @@
+{% extends "layout.html" %}
+
+{% block title %}Portfolio{% endblock %}
+
+{% block main %}
+    <div class="tl-page-header">
+        <h1>Portfolio</h1>
+        <p>Your holdings at a glance</p>
+    </div>
+
+    <!-- Summary cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+        <div class="tl-card tl-stat">
+            <div class="tl-stat-label">Total Value</div>
+            <div class="tl-stat-value">{{ total }}</div>
+        </div>
+        <div class="tl-card tl-stat">
+            <div class="tl-stat-label">Cash Balance</div>
+            <div class="tl-stat-value">{{ cash }}</div>
+        </div>
+    </div>
+
+    {% if stocks %}
+    <div class="tl-card" style="padding: 0; overflow: hidden;">
+        <table class="tl-table">
+            <thead>
+                <tr>
+                    <th style="text-align: left;">Symbol</th>
+                    <th style="text-align: right;">Shares</th>
+                    <th style="text-align: right;">Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stock in stocks %}
+                <tr>
+                    <td style="text-align: left;">
+                        <a class="tl-symbol-link" href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
+                    </td>
+                    <td style="text-align: right;">{{ stock.shares }}</td>
+                    <td style="text-align: right;">{{ stock.price }}</td>
+                    <td style="text-align: right; font-weight: 500;">{{ stock.total_price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="tl-card tl-empty">
+        <div class="tl-empty-icon">📊</div>
+        <p>No stocks yet. <a href="/search">Search for stocks</a> to start building your portfolio.</p>
+    </div>
+    {% endif %}
+{% endblock %}
