@@ -155,7 +155,7 @@
                 legend: {
                     position: 'top',
                     labels: {
-                        font: { family: "'JetBrains Mono', monospace", size: 11 },
+                        font: { family: "'Inter', sans-serif", size: 11 },
                         color: textMuted,
                         usePointStyle: true,
                         pointStyle: 'line',
@@ -169,8 +169,8 @@
                     borderColor: border,
                     borderWidth: 1,
                     padding: 10,
-                    titleFont: { family: "'JetBrains Mono', monospace", weight: '600' },
-                    bodyFont: { family: "'JetBrains Mono', monospace" },
+                    titleFont: { family: "'Inter', sans-serif", weight: '600' },
+                    bodyFont: { family: "'Inter', sans-serif" },
                     callbacks: {
                         label: function(context) {
                             return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN', {minimumFractionDigits: 2});
@@ -183,14 +183,14 @@
                     ticks: {
                         maxTicksLimit: 10,
                         maxRotation: 0,
-                        font: { family: "'JetBrains Mono', monospace", size: 10 },
+                        font: { family: "'Inter', sans-serif", size: 10 },
                         color: textDim,
                     },
                     grid: { display: false }
                 },
                 y: {
                     ticks: {
-                        font: { family: "'JetBrains Mono', monospace", size: 10 },
+                        font: { family: "'Inter', sans-serif", size: 10 },
                         color: textDim,
                         callback: function(value) {
                             return '₹' + value.toLocaleString('en-IN');
