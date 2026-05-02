@@ -4,14 +4,14 @@
 
 {% block main %}
     <div class="tl-auth-container">
-        <h2>Search Stocks</h2>
+        <h2 style="text-align: center;">Search Stocks</h2>
         <p class="tl-auth-sub">Find Indian stocks by name or ticker</p>
 
         <div class="tl-card">
             <form action="/search" method="post">
                 <div class="tl-form-group">
                     <label class="tl-label" for="search-query">Stock name or symbol</label>
-                    <input autocomplete="on" autofocus class="tl-input" id="search-query" name="query" placeholder="e.g. Reliance, TCS, INFY" type="text">
+                    <input autocomplete="on" autofocus class="tl-input" id="search-query" name="query" placeholder="RELIANCE, TCS, INFY..." type="text">
                 </div>
                 <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span>Search</span><div class="tl-btn-glint"></div></button>
             </form>

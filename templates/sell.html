@@ -4,10 +4,10 @@
 
 {% block main %}
     <div class="tl-auth-container">
-        <h2>Sell Stocks</h2>
+        <h2 style="text-align: center;">Sell Stocks</h2>
         <p class="tl-auth-sub">Select a stock and number of shares to sell</p>
 
-        <div class="tl-card">
+        <div class="tl-card" style="border-top: 2px solid var(--tl-red);">
             <form action="/sell" method="post">
                 <div class="tl-form-group">
                     <label class="tl-label" for="sell-symbol">Stock</label>
@@ -20,9 +20,9 @@
                 </div>
                 <div class="tl-form-group">
                     <label class="tl-label" for="sell-shares">Shares</label>
-                    <input autocomplete="off" class="tl-input" id="sell-shares" min="1" name="shares" placeholder="Number of shares" type="number">
+                    <input autocomplete="off" class="tl-input" id="sell-shares" min="1" name="shares" placeholder="QTY" type="number">
                 </div>
-                <button class="tl-btn tl-btn-danger tl-btn-full" type="submit"><span>Sell</span><div class="tl-btn-glint"></div></button>
+                <button class="tl-btn tl-btn-danger tl-btn-full" type="submit"><span> Sell</span><div class="tl-btn-glint"></div></button>
             </form>
         </div>
     </div>

@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, flash, redirect, render_template, request, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -48,13 +48,25 @@ def index():
         price = float(lookup(stock["stock"])["price"])
         total_price += price * stock["shares"]
         all_stocks.append({"stock": stock["stock"], "shares": stock["shares"], "price": inr(
-            price), "total_price": inr(price * stock["shares"])})
+            price), "raw_price": price, "total_price": inr(price * stock["shares"])})
 
     cash_row = db.execute("select cash from users where id = ?", session["user_id"])
     cash = float(cash_row[0]["cash"]) if cash_row else 0.0
     total_worth = total_price + cash
     print(all_stocks)
     return render_template("index.html", stocks=all_stocks, cash=inr(cash), total=inr(total_worth))
+
+
+
+@app.route("/api/sparkline/<symbol>")
+@login_required
+def sparkline(symbol):
+    """Return 1-month close prices as JSON for sparkline charts."""
+    data = get_historical_data(symbol, period="1mo")
+    if not data or not data["records"]:
+        return jsonify({"closes": []})
+    closes = [r["close"] for r in data["records"]]
+    return jsonify({"closes": closes})
 
 
 @app.route("/buy", methods=["POST"])

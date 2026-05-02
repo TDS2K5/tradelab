@@ -22,16 +22,16 @@
             <tbody>
                 {% for t in transactions %}
                 <tr>
-                    <td style="text-align: left; font-weight: 500;">{{ t.stock | strip_suffix }}</td>
+                    <td style="text-align: left; font-weight: 600;">{{ t.stock | strip_suffix }}</td>
                     <td style="text-align: right;">
                         {% if t.shares | string | first == '+' %}
-                            <span class="tl-badge tl-badge-green">{{ t.shares }}</span>
+                            <span class="tl-badge tl-badge-purple">{{ t.shares }}</span>
                         {% else %}
                             <span class="tl-badge tl-badge-red">{{ t.shares }}</span>
                         {% endif %}
                     </td>
                     <td style="text-align: right;">{{ t.price }}</td>
-                    <td style="text-align: right; color: #888;">{{ t.time }}</td>
+                    <td style="text-align: right; color: var(--tl-text-dim);">{{ t.time }}</td>
                 </tr>
                 {% endfor %}
             </tbody>

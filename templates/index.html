@@ -2,49 +2,124 @@
 
 {% block title %}Portfolio{% endblock %}
 
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
 {% block main %}
     <div class="tl-page-header">
         <h1>Portfolio</h1>
         <p>Your holdings at a glance</p>
     </div>
 
-    <!-- Summary cards -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem;">
+    <!-- Bentogrid: Stat Cards -->
+    <div class="tl-bento tl-bento-stats" style="margin-bottom: 1.25rem;">
         <div class="tl-card tl-stat">
             <div class="tl-stat-label">Total Value</div>
-            <div class="tl-stat-value">{{ total }}</div>
+            <div class="tl-stat-value" style="color: var(--tl-yellow);">{{ total }}</div>
         </div>
         <div class="tl-card tl-stat">
             <div class="tl-stat-label">Cash Balance</div>
             <div class="tl-stat-value">{{ cash }}</div>
         </div>
+        <div class="tl-card tl-stat">
+            <div class="tl-stat-label">Stocks Held</div>
+            <div class="tl-stat-value">{{ stocks | length }}</div>
+        </div>
     </div>
 
     {% if stocks %}
-    <div class="tl-card" style="padding: 0; overflow: hidden;">
-        <table class="tl-table">
-            <thead>
-                <tr>
-                    <th style="text-align: left;">Symbol</th>
-                    <th style="text-align: right;">Shares</th>
-                    <th style="text-align: right;">Price</th>
-                    <th style="text-align: right;">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for stock in stocks %}
-                <tr>
-                    <td style="text-align: left;">
-                        <a class="tl-symbol-link" href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
-                    </td>
-                    <td style="text-align: right;">{{ stock.shares }}</td>
-                    <td style="text-align: right;">{{ stock.price }}</td>
-                    <td style="text-align: right; font-weight: 500;">{{ stock.total_price }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Stock Cards Grid -->
+    <div class="tl-stock-grid">
+        {% for stock in stocks %}
+        <div class="tl-stock-card">
+            <div class="tl-stock-card-header">
+                <div class="tl-stock-card-symbol">
+                    <a href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
+                </div>
+                <div class="tl-stock-card-shares">{{ stock.shares }} shares</div>
+            </div>
+
+            <div class="tl-stock-card-price">{{ stock.price }}</div>
+            <div class="tl-stock-card-total">Total: <span>{{ stock.total_price }}</span></div>
+
+            <div class="tl-stock-card-chart">
+                <canvas id="spark-{{ loop.index }}"></canvas>
+            </div>
+
+            <div class="tl-stock-card-footer">
+                <span>1M trend</span>
+                <a href="/quote/{{ stock.stock }}">View →</a>
+            </div>
+        </div>
+        {% endfor %}
     </div>
+
+    <script>
+    (function() {
+        const stocks = {{ stocks | tojson }};
+        const cs = getComputedStyle(document.documentElement);
+        const purple = cs.getPropertyValue('--tl-purple').trim();
+        const red = cs.getPropertyValue('--tl-red').trim();
+        const green = cs.getPropertyValue('--tl-green').trim();
+
+        stocks.forEach(function(stock, i) {
+            const canvasId = 'spark-' + (i + 1);
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+
+            fetch('/api/sparkline/' + encodeURIComponent(stock.stock))
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.closes || data.closes.length < 2) {
+                        canvas.parentElement.style.display = 'none';
+                        return;
+                    }
+
+                    const closes = data.closes;
+                    const isUp = closes[closes.length - 1] >= closes[0];
+                    const lineColor = isUp ? green : red;
+
+                    const ctx = canvas.getContext('2d');
+                    const gradient = ctx.createLinearGradient(0, 0, 0, 64);
+                    gradient.addColorStop(0, isUp ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)');
+                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: closes.map((_, j) => j),
+                            datasets: [{
+                                data: closes,
+                                borderColor: lineColor,
+                                backgroundColor: gradient,
+                                borderWidth: 1.5,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 0,
+                                pointHoverRadius: 0,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                            scales: {
+                                x: { display: false },
+                                y: { display: false }
+                            },
+                            elements: { line: { borderJoinStyle: 'round' } },
+                            animation: { duration: 600 }
+                        }
+                    });
+                })
+                .catch(() => {
+                    canvas.parentElement.style.display = 'none';
+                });
+        });
+    })();
+    </script>
+
     {% else %}
     <div class="tl-card tl-empty">
         <div class="tl-empty-icon">📊</div>

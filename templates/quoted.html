@@ -12,9 +12,9 @@
 
             <div style="display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;">
                 <h1 style="margin: 0;">{{ stock.name }}</h1>
-                <span style="color: #888; font-size: 0.9rem;">{{ stock.symbol | strip_suffix }}</span>
+                <span class="mono" style="color: var(--tl-text-muted); font-size: 0.85rem;">{{ stock.symbol | strip_suffix }}</span>
                 {% if stock.website %}
-                <a href="{{ stock.website }}" target="_blank" rel="noopener" style="color: #888; display: inline-flex; align-items: center;" title="Company website">
+                <a href="{{ stock.website }}" target="_blank" rel="noopener" style="color: var(--tl-text-muted); display: inline-flex; align-items: center;" title="Company website">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 </a>
                 {% endif %}
@@ -24,7 +24,7 @@
 
             <div class="tl-meta-row">
                 {% if stock.sector %}
-                <span class="tl-badge tl-badge-blue">{{ stock.sector }}</span>
+                <span class="tl-badge tl-badge-purple">{{ stock.sector }}</span>
                 {% endif %}
                 {% if stock.industry %}
                 <span class="tl-badge tl-badge-gray">{{ stock.industry }}</span>
@@ -51,19 +51,37 @@
             {% endif %}
         </div>
 
-        <!-- Right: Buy Action -->
+        <!-- Right: Trade Execution Widget -->
         <div>
             <div class="tl-card tl-action-card">
-                <h4 style="margin-bottom: 1rem;">Buy {{ stock.symbol | strip_suffix }}</h4>
-                <form action="/buy" method="post">
+                <h4>Execute Trade</h4>
+
+                <div class="tl-trade-price">
+                    <span>CURRENT PRICE</span><br>
+                    {{ value }}
+                </div>
+
+                <form action="/buy" method="post" id="trade-form">
                     <input type="hidden" value="{{ stock.symbol }}" name="symbol">
                     <div class="tl-form-group">
-                        <label class="tl-label" for="buy-shares">Number of shares</label>
-                        <input autocomplete="off" class="tl-input" id="buy-shares" min="1" name="shares" placeholder="e.g. 10" type="number">
+                        <label class="tl-label" for="buy-shares">Shares</label>
+                        <input autocomplete="off" class="tl-input" id="buy-shares" min="1" name="shares" placeholder="QTY" type="number" oninput="updateTotal()">
                     </div>
-                    <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span>Buy</span><div class="tl-btn-glint"></div></button>
+                    <div style="font-family: var(--tl-font-mono); font-size: 0.78rem; color: var(--tl-text-muted); margin-bottom: 0.75rem; padding: 0.4rem 0; border-top: 1px solid var(--tl-border);">
+                        EST. TOTAL: <span id="trade-total" style="color: var(--tl-yellow); font-weight: 600;">₹0.00</span>
+                    </div>
+                    <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span> Buy</span><div class="tl-btn-glint"></div></button>
                 </form>
             </div>
         </div>
     </div>
+
+    <script>
+    function updateTotal() {
+        const shares = parseInt(document.getElementById('buy-shares').value) || 0;
+        const price = {{ stock.price }};
+        const total = (shares * price).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        document.getElementById('trade-total').textContent = '₹' + total;
+    }
+    </script>
 {% endblock %}
