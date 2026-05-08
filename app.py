@@ -98,14 +98,16 @@ def buy():
     if float(balance["cash"]) < float(stock["price"]) * shares:
         return apology("You don't have enough balance")
 
-    # check if it already exists
-    if len(db.execute("select * from portfolio where stock = ?", symbol)) != 0:
-        db.execute("update portfolio set shares = shares + ? where stock = ?", shares, symbol)
+   # check if it already exists
+    existing = db.execute("SELECT * FROM portfolio WHERE user_id = ? AND stock = ?", session["user_id"], symbol)
+    if existing:
+        db.execute("UPDATE portfolio SET shares = shares + ? WHERE user_id = ? AND stock = ?", shares, session["user_id"], symbol)
     else:
-        db.execute("INSERT INTO portfolio values (?, ?, ?)", session["user_id"], symbol, shares)
+        db.execute("INSERT INTO portfolio (user_id, stock, shares) VALUES (?, ?, ?)", session["user_id"], symbol, shares)
 
     db.execute("INSERT INTO transactions values (?, ?, ?, datetime('now'), ?)",
                 session["user_id"], symbol, f"+{shares}", inr(float(stock["price"])))
+    print(session["user_id"])
     db.execute("update users set cash = cash - ? where id = ?",
                 float(stock["price"]) * float(shares), session["user_id"])
     return redirect("/")
