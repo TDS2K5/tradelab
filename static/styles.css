@@ -215,23 +215,25 @@ small,
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.85rem;
-    font-weight: 500;
+    padding: 0.75rem 1.25rem;
+    margin: 0.25rem 1rem;
     color: var(--tl-text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
     text-decoration: none;
-    border-left: 2px solid transparent;
-    transition: all 0.15s ease;
+    border-radius: 6.25rem;
+    transform-origin: left center;
+    will-change: transform;
+    transition: color 0.15s ease, background 0.15s ease;
 }
 
 .tl-sidebar-nav a:hover {
-    color: var(--tl-text);
-    background: var(--tl-surface-2);
+    color: var(--tl-base);
+    background: var(--tl-text);
 }
 
 .tl-sidebar-nav a.active {
     color: var(--tl-purple);
-    border-left-color: var(--tl-purple);
     background: var(--tl-purple-dim);
 }
 

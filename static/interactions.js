@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Magnetic Hover System (for links, cards, icons, nav items)
     // Avoid magnetic effect on mobile where hover doesn't make sense
     if (window.matchMedia("(hover: hover)").matches) {
-        const magneticElements = document.querySelectorAll('a:not(.button), .tl-sidebar-nav a, .hover-target');
+        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a), .hover-target');
 
         magneticElements.forEach(el => {
             el.addEventListener('mousemove', (e) => {
@@ -111,4 +111,43 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         );
     });
+
+    // 5. MacOS Dock-style Hover System for Navbar (Vertical)
+    const navDock = document.querySelector('.tl-sidebar-nav');
+    const navItems = document.querySelectorAll('.tl-sidebar-nav a');
+
+    if (navDock && navItems.length > 0 && window.matchMedia("(hover: hover)").matches) {
+        navDock.addEventListener('mousemove', (e) => {
+            navItems.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const itemCenterY = rect.top + rect.height / 2;
+                
+                // Vertical distance to cursor
+                const distance = Math.abs(e.clientY - itemCenterY);
+                const maxDistance = 120;
+                
+                let scale = 1;
+                if (distance < maxDistance) {
+                    // Scale up to 1.15x for items near cursor
+                    scale = 1 + (1 - distance / maxDistance) * 0.15;
+                }
+
+                gsap.to(item, {
+                    scale: scale,
+                    duration: 0.2,
+                    ease: "power2.out"
+                });
+            });
+        });
+
+        navDock.addEventListener('mouseleave', () => {
+            navItems.forEach(item => {
+                gsap.to(item, {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: "power3.out"
+                });
+            });
+        });
+    }
 });
