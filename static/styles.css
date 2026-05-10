@@ -17,8 +17,8 @@
     --tl-red-dim: rgba(239, 68, 68, 0.12);
     --tl-green: #22C55E;
     --tl-green-dim: rgba(34, 197, 94, 0.12);
-    --tl-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --tl-font-mono: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --tl-font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --tl-font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --sidebar-w: 224px;
 }
 
@@ -28,16 +28,16 @@
     --tl-surface: #FFFFFF;
     --tl-surface-2: #F0EDE8;
     --tl-surface-3: #E8E4DF;
-    --tl-border: #999999;
-    --tl-border-bright: #777777;
-    --tl-text: #1A1A1A;
-    --tl-text-muted: #6B6560;
-    --tl-text-dim: #8A847E;
+    --tl-border: #000000;
+    --tl-border-bright: #000000;
+    --tl-text: #000000;
+    --tl-text-muted: #000000;
+    --tl-text-dim: #000000;
     --tl-purple: #4752C4;
     --tl-purple-dim: rgba(71, 82, 196, 0.1);
     --tl-purple-glow: rgba(71, 82, 196, 0.25);
-    --tl-yellow: #1A1A1A;
-    --tl-yellow-dim: rgba(26, 26, 26, 0.08);
+    --tl-yellow: #000000;
+    --tl-yellow-dim: rgba(0, 0, 0, 0.08);
     --tl-red: #DC2626;
     --tl-red-dim: rgba(220, 38, 38, 0.08);
     --tl-green: #16A34A;
@@ -552,20 +552,20 @@ small,
     display: block;
     width: 100%;
     padding: 0.55rem 0.75rem;
+    padding: 0.75rem 1.25rem;
     font-size: 0.85rem;
     font-family: var(--tl-font-mono);
     color: var(--tl-text);
     background: var(--tl-surface-2);
     border: 2px solid var(--tl-border);
-    border-radius: 0;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    border-radius: 6.25rem;
+    transition: border-color 0.15s ease;
     outline: none;
 }
 
 .tl-input:focus,
 .tl-select:focus {
     border-color: var(--tl-purple);
-    box-shadow: 0 0 0 2px var(--tl-purple-dim);
 }
 
 .tl-input::placeholder {

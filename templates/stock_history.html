@@ -155,7 +155,7 @@
                 legend: {
                     position: 'top',
                     labels: {
-                        font: { family: "'Inter', sans-serif", size: 11 },
+                        font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", size: 11 },
                         color: textMuted,
                         usePointStyle: true,
                         pointStyle: 'line',
@@ -169,8 +169,8 @@
                     borderColor: border,
                     borderWidth: 1,
                     padding: 10,
-                    titleFont: { family: "'Inter', sans-serif", weight: '600' },
-                    bodyFont: { family: "'Inter', sans-serif" },
+                    titleFont: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", weight: '600' },
+                    bodyFont: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif" },
                     callbacks: {
                         label: function(context) {
                             return context.dataset.label + ': ₹' + context.parsed.y.toLocaleString('en-IN', {minimumFractionDigits: 2});
@@ -183,14 +183,14 @@
                     ticks: {
                         maxTicksLimit: 10,
                         maxRotation: 0,
-                        font: { family: "'Inter', sans-serif", size: 10 },
+                        font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", size: 10 },
                         color: textDim,
                     },
                     grid: { display: false }
                 },
                 y: {
                     ticks: {
-                        font: { family: "'Inter', sans-serif", size: 10 },
+                        font: { family: "'Helvetica Neue', Helvetica, Arial, sans-serif", size: 10 },
                         color: textDim,
                         callback: function(value) {
                             return '₹' + value.toLocaleString('en-IN');
