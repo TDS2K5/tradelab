@@ -55,15 +55,17 @@
         {% endfor %}
     </div>
 
+    <div id="portfolio-data" data-stocks='{{ stocks | tojson | safe }}' style="display: none;"></div>
     <script>
     (function() {
-        const stocks = {{ stocks | tojson }};
+        const dataEl = document.getElementById('portfolio-data');
+        const chartStocks = JSON.parse(dataEl.getAttribute('data-stocks'));
         const cs = getComputedStyle(document.documentElement);
         const purple = cs.getPropertyValue('--tl-purple').trim();
         const red = cs.getPropertyValue('--tl-red').trim();
         const green = cs.getPropertyValue('--tl-green').trim();
 
-        stocks.forEach(function(stock, i) {
+        chartStocks.forEach(function(stock, i) {
             const canvasId = 'spark-' + (i + 1);
             const canvas = document.getElementById(canvasId);
             if (!canvas) return;

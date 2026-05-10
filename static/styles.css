@@ -225,9 +225,10 @@ small, .text-muted { color: var(--tl-text-muted) !important; }
     border: 2px solid var(--tl-border);
     border-left: 3px solid var(--tl-purple);
     color: var(--tl-text);
-    padding: 0.65rem 1rem;
+    padding: 0.65rem 1.25rem;
     margin-bottom: 1.25rem;
     font-size: 0.85rem;
+    border-radius: 6.25rem;
 }
 
 /* --- Cards (Neo-Brutalist) --- */
