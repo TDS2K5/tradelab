@@ -37,7 +37,7 @@
             <p class="tl-summary">{{ stock.summary }}</p>
             {% endif %}
 
-            <a href="/stockhistory/{{ stock.symbol }}" class="tl-btn tl-btn-outline tl-btn-sm" style="margin-top: 0.75rem;"><span>View Historical Data →</span><div class="tl-btn-glint"></div></a>
+            <a href="/stockhistory/{{ stock.symbol }}" class="button button--stroke tl-btn-outline tl-btn-sm" style="margin-top: 0.75rem;"><span class="button__flair"></span><span class="button__label">View Historical Data →</span></a>
 
             {% if stock.officers %}
             <hr class="tl-divider">
@@ -70,7 +70,7 @@
                     <div style="font-family: var(--tl-font-mono); font-size: 0.78rem; color: var(--tl-text-muted); margin-bottom: 0.75rem; padding: 0.4rem 0; border-top: 1px solid var(--tl-border);">
                         EST. TOTAL: <span id="trade-total" style="color: var(--tl-yellow); font-weight: 600;">₹0.00</span>
                     </div>
-                    <button class="tl-btn tl-btn-primary tl-btn-full" type="submit"><span> Buy</span><div class="tl-btn-glint"></div></button>
+                    <button class="button button--stroke tl-btn-primary tl-btn-full" type="submit"><span class="button__flair"></span><span class="button__label"> Buy</span></button>
                 </form>
             </div>
         </div>

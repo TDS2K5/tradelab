@@ -14,7 +14,7 @@
                 <span class="tl-result-name">{{ stock.name }}</span>
                 <span class="tl-result-price">{{ stock.price | inr }}</span>
             </div>
-            <a class="tl-btn tl-btn-outline tl-btn-sm" href="/quote/{{ stock.symbol }}"><span>View</span><div class="tl-btn-glint"></div></a>
+            <a class="button button--stroke tl-btn-outline tl-btn-sm" href="/quote/{{ stock.symbol }}"><span class="button__flair"></span><span class="button__label">View</span></a>
         </div>
         {% else %}
         <div class="tl-card tl-empty">
