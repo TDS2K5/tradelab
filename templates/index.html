@@ -1,131 +1,151 @@
-{% extends "layout.html" %}
-
-{% block title %}Portfolio{% endblock %}
-
-{% block extra_head %}
+{% extends "layout.html" %} {% block title %}Portfolio{% endblock %} {% block
+extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-{% endblock %}
+{% endblock %} {% block main %}
+<div class="tl-page-header">
+  <h1>Portfolio</h1>
+  <p>Your holdings at a glance</p>
+</div>
 
-{% block main %}
-    <div class="tl-page-header">
-        <h1>Portfolio</h1>
-        <p>Your holdings at a glance</p>
+<!-- Bentogrid: Stat Cards -->
+<div class="tl-bento tl-bento-stats" style="margin-bottom: 1.25rem">
+  <div class="tl-card tl-stat">
+    <div class="tl-stat-label">Total Value</div>
+    <div class="tl-stat-value" style="color: var(--tl-yellow)">{{ total }}</div>
+  </div>
+  <div class="tl-card tl-stat">
+    <div class="tl-stat-label">Cash Balance</div>
+    <div class="tl-stat-value">{{ cash }}</div>
+  </div>
+  <div class="tl-card tl-stat">
+    <div class="tl-stat-label">Stocks Held</div>
+    <div class="tl-stat-value">{{ stocks | length }}</div>
+  </div>
+</div>
+
+{% if stocks %}
+<!-- Stock Cards Grid -->
+<div class="tl-stock-grid">
+  {% for stock in stocks %}
+  <div class="tl-stock-card">
+    <div class="tl-stock-card-header">
+      <div class="tl-stock-card-symbol">
+        <a href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
+      </div>
+      <div class="tl-stock-card-shares">
+        Held :<br /><span style="font-size: 1.3rem; color: var(--tl-text)"
+          >{{ stock.shares }}</span
+        >
+      </div>
     </div>
 
-    <!-- Bentogrid: Stat Cards -->
-    <div class="tl-bento tl-bento-stats" style="margin-bottom: 1.25rem;">
-        <div class="tl-card tl-stat">
-            <div class="tl-stat-label">Total Value</div>
-            <div class="tl-stat-value" style="color: var(--tl-yellow);">{{ total }}</div>
-        </div>
-        <div class="tl-card tl-stat">
-            <div class="tl-stat-label">Cash Balance</div>
-            <div class="tl-stat-value">{{ cash }}</div>
-        </div>
-        <div class="tl-card tl-stat">
-            <div class="tl-stat-label">Stocks Held</div>
-            <div class="tl-stat-value">{{ stocks | length }}</div>
-        </div>
+    <div class="tl-stock-card-price">{{ stock.price }}</div>
+    <div class="tl-stock-card-total">
+      Total: <span>{{ stock.total_price }}</span>
     </div>
 
-    {% if stocks %}
-    <!-- Stock Cards Grid -->
-    <div class="tl-stock-grid">
-        {% for stock in stocks %}
-        <div class="tl-stock-card">
-            <div class="tl-stock-card-header">
-                <div class="tl-stock-card-symbol">
-                    <a href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
-                </div>
-                <div class="tl-stock-card-shares">Held :<br><span style="font-size: 1.3rem; color: var(--tl-text);">{{ stock.shares }}</span></div>
-            </div>
-
-            <div class="tl-stock-card-price">{{ stock.price }}</div>
-            <div class="tl-stock-card-total">Total: <span>{{ stock.total_price }}</span></div>
-
-            <div class="tl-stock-card-chart">
-                <canvas id="spark-{{ loop.index }}"></canvas>
-            </div>
-
-            <div class="tl-stock-card-footer">
-                <span>1M trend</span>
-                <a href="/quote/{{ stock.stock }}">View →</a>
-            </div>
-        </div>
-        {% endfor %}
+    <div class="tl-stock-card-chart">
+      <canvas id="spark-{{ loop.index }}"></canvas>
     </div>
 
-    <div id="portfolio-data" data-stocks='{{ stocks | tojson | safe }}' style="display: none;"></div>
-    <script>
-    (function() {
-        const dataEl = document.getElementById('portfolio-data');
-        const chartStocks = JSON.parse(dataEl.getAttribute('data-stocks'));
-        const cs = getComputedStyle(document.documentElement);
-        const purple = cs.getPropertyValue('--tl-purple').trim();
-        const red = cs.getPropertyValue('--tl-red').trim();
-        const green = cs.getPropertyValue('--tl-green').trim();
+    <div class="tl-stock-card-footer">
+      <span>1M trend</span>
+      <a
+        href="/quote/{{ stock.stock }}"
+        class="button button--stroke tl-btn-primary tl-btn-sm"
+        ><span class="button__flair"></span
+        ><span class="button__label">View</span></a
+      >
+    </div>
+  </div>
+  {% endfor %}
+</div>
 
-        chartStocks.forEach(function(stock, i) {
-            const canvasId = 'spark-' + (i + 1);
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
+<div
+  id="portfolio-data"
+  data-stocks='{{ stocks | tojson | safe }}'
+  style="display: none"
+></div>
+<script>
+  (function () {
+    const dataEl = document.getElementById("portfolio-data");
+    const chartStocks = JSON.parse(dataEl.getAttribute("data-stocks"));
+    const cs = getComputedStyle(document.documentElement);
+    const purple = cs.getPropertyValue("--tl-purple").trim();
+    const red = cs.getPropertyValue("--tl-red").trim();
+    const green = cs.getPropertyValue("--tl-green").trim();
 
-            fetch('/api/sparkline/' + encodeURIComponent(stock.stock))
-                .then(r => r.json())
-                .then(data => {
-                    if (!data.closes || data.closes.length < 2) {
-                        canvas.parentElement.style.display = 'none';
-                        return;
-                    }
+    chartStocks.forEach(function (stock, i) {
+      const canvasId = "spark-" + (i + 1);
+      const canvas = document.getElementById(canvasId);
+      if (!canvas) return;
 
-                    const closes = data.closes;
-                    const isUp = closes[closes.length - 1] >= closes[0];
-                    const lineColor = isUp ? green : red;
+      fetch("/api/sparkline/" + encodeURIComponent(stock.stock))
+        .then((r) => r.json())
+        .then((data) => {
+          if (!data.closes || data.closes.length < 2) {
+            canvas.parentElement.style.display = "none";
+            return;
+          }
 
-                    const ctx = canvas.getContext('2d');
-                    const gradient = ctx.createLinearGradient(0, 0, 0, 64);
-                    gradient.addColorStop(0, isUp ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)');
-                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+          const closes = data.closes;
+          const isUp = closes[closes.length - 1] >= closes[0];
+          const lineColor = isUp ? green : red;
 
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: closes.map((_, j) => j),
-                            datasets: [{
-                                data: closes,
-                                borderColor: lineColor,
-                                backgroundColor: gradient,
-                                borderWidth: 1.5,
-                                fill: true,
-                                tension: 0.4,
-                                pointRadius: 0,
-                                pointHoverRadius: 0,
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            scales: {
-                                x: { display: false },
-                                y: { display: false }
-                            },
-                            elements: { line: { borderJoinStyle: 'round' } },
-                            animation: false
-                        }
-                    });
-                })
-                .catch(() => {
-                    canvas.parentElement.style.display = 'none';
-                });
+          const ctx = canvas.getContext("2d");
+          const gradient = ctx.createLinearGradient(0, 0, 0, 64);
+          gradient.addColorStop(
+            0,
+            isUp ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)",
+          );
+          gradient.addColorStop(1, "rgba(0,0,0,0)");
+
+          new Chart(ctx, {
+            type: "line",
+            data: {
+              labels: closes.map((_, j) => j),
+              datasets: [
+                {
+                  data: closes,
+                  borderColor: lineColor,
+                  backgroundColor: gradient,
+                  borderWidth: 1.5,
+                  fill: true,
+                  tension: 0.4,
+                  pointRadius: 0,
+                  pointHoverRadius: 0,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false },
+              },
+              scales: {
+                x: { display: false },
+                y: { display: false },
+              },
+              elements: { line: { borderJoinStyle: "round" } },
+              animation: false,
+            },
+          });
+        })
+        .catch(() => {
+          canvas.parentElement.style.display = "none";
         });
-    })();
-    </script>
+    });
+  })();
+</script>
 
-    {% else %}
-    <div class="tl-card tl-empty">
-        <div class="tl-empty-icon">📊</div>
-        <p>No stocks yet. <a href="/search">Search for stocks</a> to start building your portfolio.</p>
-    </div>
-    {% endif %}
-{% endblock %}
+{% else %}
+<div class="tl-card tl-empty">
+  <div class="tl-empty-icon">📊</div>
+  <p>
+    No stocks yet. <a href="/search">Search for stocks</a> to start building
+    your portfolio.
+  </p>
+</div>
+{% endif %} {% endblock %}
