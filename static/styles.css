@@ -238,6 +238,16 @@ small,
     overflow: hidden;
 }
 
+.tl-sidebar:not(:hover) .button__label {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.tl-sidebar:hover .button__label {
+    opacity: 1;
+    transition: opacity 0.3s ease 0.1s;
+}
+
 .tl-sidebar-nav a:hover {
     color: var(--tl-base);
     background: var(--tl-text);
