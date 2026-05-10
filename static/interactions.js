@@ -92,26 +92,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 4. Reveal on Scroll System
-    const revealTargets = document.querySelectorAll('.tl-card, .tl-page-header, .tl-bento-stats, .tl-stock-grid > div, .tl-auth-container');
-    
-    revealTargets.forEach(target => {
-        gsap.fromTo(target, 
-            { y: 30, opacity: 0 },
-            {
-                y: 0,
-                opacity: 1,
-                duration: 0.8,
-                ease: easeOut,
-                scrollTrigger: {
-                    trigger: target,
-                    start: 'top 85%',
-                    toggleActions: 'play none none reverse'
-                }
-            }
-        );
-    });
-
     // 5. MacOS Dock-style Hover System for Navbar (Vertical)
     const navDock = document.querySelector('.tl-sidebar-nav');
     const navItems = document.querySelectorAll('.tl-sidebar-nav a');
