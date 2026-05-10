@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Magnetic Hover System (for links, cards, icons, nav items)
     // Avoid magnetic effect on mobile where hover doesn't make sense
     if (window.matchMedia("(hover: hover)").matches) {
-        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a), .hover-target');
+        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a), .hover-target');
 
         magneticElements.forEach(el => {
             el.addEventListener('mousemove', (e) => {
