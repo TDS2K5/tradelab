@@ -119,30 +119,29 @@ h6 {
     font-weight: 700;
     color: var(--tl-text);
     line-height: 1.25;
-    letter-spacing: -0.02em;
 }
 
 h1 {
-    font-size: 1.6rem;
+    font-size: 2.4rem;
 }
 
 h2 {
-    font-size: 1.35rem;
+    font-size: 1.8rem;
 }
 
 h3 {
-    font-size: 1.15rem;
+    font-size: 1.4rem;
 }
 
 h4 {
-    font-size: 0.95rem;
+    font-size: 1.1rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
 }
 
 p {
     color: var(--tl-text-muted);
-    font-size: 0.88rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
 }
 
 a {
@@ -189,9 +188,8 @@ small,
 }
 
 .tl-sidebar-brand a {
-    font-size: 1.3rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    letter-spacing: -0.03em;
     text-decoration: none;
 }
 
@@ -394,7 +392,6 @@ small,
 .tl-stat-label {
     font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
     color: var(--tl-text-muted);
     font-weight: 600;
     margin-bottom: 0.35rem;
@@ -432,7 +429,6 @@ small,
 .tl-table thead th {
     font-size: 0.68rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
     color: var(--tl-text-muted);
     font-weight: 600;
     padding: 0.6rem 0.75rem;
@@ -482,7 +478,6 @@ small,
     font-weight: 700;
     font-family: var(--tl-font-body);
     text-transform: uppercase;
-    letter-spacing: 0.06em;
     border-radius: 0;
     border: 2px solid;
     cursor: pointer;
@@ -615,7 +610,6 @@ small,
     color: var(--tl-text-muted);
     margin-bottom: 0.3rem;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
 }
 
 .tl-form-group {
@@ -624,7 +618,7 @@ small,
 
 /* --- Auth Pages --- */
 .tl-auth-container {
-    max-width: 400px;
+    max-width: 480px;
     margin: 4rem auto 0;
 }
 
@@ -636,7 +630,7 @@ small,
 .tl-auth-container .tl-auth-sub {
     text-align: center;
     color: var(--tl-text-muted);
-    font-size: 0.85rem;
+    font-size: 1.1rem;
     margin-bottom: 1.5rem;
 }
 
@@ -647,7 +641,6 @@ small,
     font-size: 0.68rem;
     font-weight: 600;
     border-radius: 0;
-    letter-spacing: 0.04em;
     text-transform: uppercase;
     font-family: var(--tl-font-mono);
 }
@@ -839,7 +832,6 @@ small,
     border-radius: 0;
     text-decoration: none;
     text-transform: uppercase;
-    letter-spacing: 0.04em;
     overflow: hidden;
     transition: all 0.15s ease;
 }
@@ -1080,7 +1072,6 @@ small,
     font-weight: 700;
     color: var(--tl-purple);
     text-decoration: none;
-    letter-spacing: 0.02em;
 }
 
 .tl-symbol-link:hover {
@@ -1118,7 +1109,6 @@ small,
     font-family: var(--tl-font-mono);
     font-weight: 700;
     font-size: 1rem;
-    letter-spacing: 0.02em;
 }
 
 .tl-stock-card-symbol a {
@@ -1135,7 +1125,6 @@ small,
     font-size: 0.72rem;
     color: var(--tl-text-muted);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
 }
 
 .tl-stock-card-price {
@@ -1179,7 +1168,6 @@ small,
     font-size: 0.68rem;
     color: var(--tl-text-dim);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
 }
 
 .tl-stock-card-footer a {
@@ -1265,7 +1253,6 @@ small,
     font-weight: 600;
     gap: 0.363636em;
     justify-content: center;
-    letter-spacing: -0.01em;
     line-height: 1.04545;
     overflow: hidden;
     padding: 0.9375rem 1.5rem;
