@@ -19,7 +19,7 @@
     --tl-green-dim: rgba(34, 197, 94, 0.12);
     --tl-font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --tl-font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --sidebar-w: 224px;
+    --sidebar-w: 260px;
 }
 
 /* --- Light Mode Overrides --- */
@@ -176,7 +176,7 @@ small,
     display: flex;
     flex-direction: column;
     z-index: 200;
-    width: 72px;
+    width: 84px;
     /* Collapsed width */
     transition: transform 0.25s ease;
     overflow-x: hidden;
@@ -222,11 +222,11 @@ small,
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    margin: 0.25rem 0.75rem;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 0.25rem 0.8rem;
     color: var(--tl-text-muted);
-    font-size: 0.9rem;
+    font-size: 1.1rem;
     font-weight: 700;
     text-decoration: none;
     border-radius: 6.25rem;
@@ -234,7 +234,8 @@ small,
     will-change: transform, width;
     transition: color 0.15s ease, background 0.15s ease;
     white-space: nowrap;
-    width: 44px;
+    width: 56px;
+    height: 56px;
     overflow: hidden;
 }
 
@@ -258,8 +259,8 @@ small,
 }
 
 .tl-sidebar-nav a svg {
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
     opacity: 0.7;
 }
@@ -278,16 +279,17 @@ small,
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    font-size: 0.82rem;
+    gap: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
     color: var(--tl-text-dim);
     text-decoration: none;
     transition: color 0.15s ease;
     white-space: nowrap;
-    width: 44px;
+    width: 56px;
+    height: 56px;
     overflow: hidden;
-    padding: 0.5rem;
+    padding: 1rem;
     border-radius: 6.25rem;
     will-change: transform, width;
 }
@@ -1003,16 +1005,17 @@ small,
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    width: 44px;
+    gap: 1rem;
+    width: 56px;
+    height: 56px;
     overflow: hidden;
     border-radius: 6.25rem;
-    padding: 0.5rem;
+    padding: 1rem;
     background: transparent;
     border: none;
     cursor: pointer;
     color: var(--tl-text-muted);
-    font-size: 0.82rem;
+    font-size: 1.1rem;
     font-weight: 700;
     font-family: var(--tl-font-body);
     transition: color 0.15s ease, background 0.15s ease;

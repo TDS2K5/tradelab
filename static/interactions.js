@@ -100,14 +100,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Expand the sidebar smoothly when hovering anywhere over it
         navDock.addEventListener('mouseenter', () => {
             gsap.to(navDock, {
-                width: 224,
+                width: 260,
                 duration: 0.4,
                 ease: "power3.out",
                 overwrite: "auto"
             });
             // Expand all items to full width to reveal text
             gsap.to(navItems, {
-                width: '180px',
+                width: '210px',
                 duration: 0.4,
                 ease: "power3.out",
                 overwrite: "auto"
@@ -143,7 +143,7 @@ document.addEventListener("DOMContentLoaded", () => {
         navDock.addEventListener('mouseleave', () => {
             // Shrink the sidebar back to its original width
             gsap.to(navDock, {
-                width: 72,
+                width: 84,
                 duration: 0.5,
                 ease: "power3.out",
                 overwrite: "auto"
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
             navItems.forEach(item => {
                 gsap.to(item, {
                     scale: 1,
-                    width: '44px',
+                    width: '56px',
                     duration: 0.4,
                     ease: "power3.out",
                     overwrite: "auto"
