@@ -37,7 +37,7 @@
                 <div class="tl-stock-card-symbol">
                     <a href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
                 </div>
-                <div class="tl-stock-card-shares">{{ stock.shares }} shares</div>
+                <div class="tl-stock-card-shares">Held :<br><span style="font-size: 1.3rem; color: var(--tl-text);">{{ stock.shares }}</span></div>
             </div>
 
             <div class="tl-stock-card-price">{{ stock.price }}</div>

@@ -402,10 +402,10 @@ small,
 }
 
 .tl-stat-label {
-    font-size: 0.68rem;
+    font-size: 1rem;
     text-transform: uppercase;
     color: var(--tl-text-muted);
-    font-weight: 600;
+    font-weight: 700;
     margin-bottom: 0.35rem;
 }
 
@@ -1135,9 +1135,11 @@ small,
 
 .tl-stock-card-shares {
     font-family: var(--tl-font-mono);
-    font-size: 0.72rem;
+    font-size: 1rem;
+    font-weight: 700;
     color: var(--tl-text-muted);
     text-transform: uppercase;
+    text-align: right;
 }
 
 .tl-stock-card-price {
