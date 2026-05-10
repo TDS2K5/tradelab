@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     // 1. Initialize ScrollSmoother and ScrollTrigger
     gsap.registerPlugin(ScrollTrigger);
-    
+
     if (typeof ScrollSmoother !== 'undefined') {
         ScrollSmoother.create({
             wrapper: '#smooth-wrapper',
@@ -117,11 +117,11 @@ document.addEventListener("DOMContentLoaded", () => {
         navDock.addEventListener('mousemove', (e) => {
             navItems.forEach(item => {
                 const rect = item.getBoundingClientRect();
-                
+
                 // Check if mouse is directly hovering over THIS specific item
                 const isHovered = e.clientX >= rect.left && e.clientX <= rect.right &&
-                                  e.clientY >= rect.top && e.clientY <= rect.bottom;
-                
+                    e.clientY >= rect.top && e.clientY <= rect.bottom;
+
                 if (isHovered) {
                     gsap.to(item, {
                         scale: 1.1, // Magnify the hovered pill
@@ -131,7 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                 } else {
                     gsap.to(item, {
-                        scale: 1, // Keep non-hovered items normal size
+                        scale: 1.1, // Keep non-hovered items normal size
                         duration: 0.3,
                         ease: "power3.out",
                         overwrite: "auto"
