@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const easeOut = "power2.out";
 
     // 2. Button Hover System (Cursor-Follow Flair)
-    const buttons = document.querySelectorAll('.button--stroke');
+    const buttons = document.querySelectorAll('.button--stroke, .tl-sidebar-nav a, .tl-sidebar-footer a, .tl-theme-toggle');
 
     buttons.forEach(btn => {
         const flair = btn.querySelector('.button__flair');
@@ -93,39 +93,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 5. MacOS Dock-style Hover System for Navbar (Vertical)
-    const navDock = document.querySelector('.tl-sidebar-nav');
-    const navItems = document.querySelectorAll('.tl-sidebar-nav a');
+    const navDock = document.querySelector('.tl-sidebar');
+    const navItems = document.querySelectorAll('.tl-sidebar-nav a, .tl-sidebar-footer a, .tl-theme-toggle');
 
     if (navDock && navItems.length > 0 && window.matchMedia("(hover: hover)").matches) {
+        // Expand the sidebar smoothly when hovering anywhere over it
+        navDock.addEventListener('mouseenter', () => {
+            gsap.to(navDock, {
+                width: 224,
+                duration: 0.4,
+                ease: "power3.out",
+                overwrite: "auto"
+            });
+            // Expand all items to full width to reveal text
+            gsap.to(navItems, {
+                width: '180px',
+                duration: 0.4,
+                ease: "power3.out",
+                overwrite: "auto"
+            });
+        });
+
         navDock.addEventListener('mousemove', (e) => {
             navItems.forEach(item => {
                 const rect = item.getBoundingClientRect();
-                const itemCenterY = rect.top + rect.height / 2;
                 
-                // Vertical distance to cursor
-                const distance = Math.abs(e.clientY - itemCenterY);
-                const maxDistance = 120;
+                // Check if mouse is directly hovering over THIS specific item
+                const isHovered = e.clientX >= rect.left && e.clientX <= rect.right &&
+                                  e.clientY >= rect.top && e.clientY <= rect.bottom;
                 
-                let scale = 1;
-                if (distance < maxDistance) {
-                    // Scale up to 1.15x for items near cursor
-                    scale = 1 + (1 - distance / maxDistance) * 0.15;
+                if (isHovered) {
+                    gsap.to(item, {
+                        scale: 1.1, // Magnify the hovered pill
+                        duration: 0.3,
+                        ease: "power3.out",
+                        overwrite: "auto"
+                    });
+                } else {
+                    gsap.to(item, {
+                        scale: 1, // Keep non-hovered items normal size
+                        duration: 0.3,
+                        ease: "power3.out",
+                        overwrite: "auto"
+                    });
                 }
-
-                gsap.to(item, {
-                    scale: scale,
-                    duration: 0.2,
-                    ease: "power2.out"
-                });
             });
         });
 
         navDock.addEventListener('mouseleave', () => {
+            // Shrink the sidebar back to its original width
+            gsap.to(navDock, {
+                width: 72,
+                duration: 0.5,
+                ease: "power3.out",
+                overwrite: "auto"
+            });
+
+            // Shrink all items back to icon only and reset scale
             navItems.forEach(item => {
                 gsap.to(item, {
                     scale: 1,
-                    duration: 0.3,
-                    ease: "power3.out"
+                    width: '44px',
+                    duration: 0.4,
+                    ease: "power3.out",
+                    overwrite: "auto"
                 });
             });
         });
