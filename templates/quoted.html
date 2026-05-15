@@ -17,12 +17,19 @@
             <div style="display: flex; align-items: baseline; gap: 0.6rem; flex-wrap: wrap;">
                 <h1 style="margin: 0;">{{ stock.name }}</h1>
                 <span class="mono" style="color: var(--tl-text-muted); font-size: 0.85rem;">{{ stock.symbol | strip_suffix }}</span>
-                {% if stock.website %}
-                <a href="{{ stock.website }}" target="_blank" rel="noopener" style="color: var(--tl-text-muted); display: inline-flex; align-items: center;" title="Company website">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                </a>
-                {% endif %}
             </div>
+
+            {% if stock.website %}
+            <a href="{{ stock.website }}" target="_blank" rel="noopener" class="button button--stroke tl-btn-outline tl-btn-sm" style="margin-top: 0.5rem;">
+                <span class="button__flair"></span>
+                <span class="button__label">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -2px; margin-right: 0.3rem;">
+                        <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                    Company Website
+                </span>
+            </a>
+            {% endif %}
 
             <div class="tl-price-large">{{ value }}</div>
 
