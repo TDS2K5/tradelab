@@ -199,7 +199,7 @@ def get_top_gainers():
 
         # Sort by monthly % gain descending, take top 8
         gainers.sort(key=lambda x: x["change_pct"], reverse=True)
-        return gainers[:8]
+        return gainers[:10]
 
     except Exception as e:
         print(f"Error fetching top gainers: {e}")

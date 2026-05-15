@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Magnetic Hover System (for links, cards, icons, nav items)
     // Avoid magnetic effect on mobile where hover doesn't make sense
     if (window.matchMedia("(hover: hover)").matches) {
-        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a), .hover-target');
+        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a):not(.tl-top-stock-card), .hover-target');
 
         magneticElements.forEach(el => {
             el.addEventListener('mousemove', (e) => {
@@ -157,6 +157,199 @@ document.addEventListener("DOMContentLoaded", () => {
                     duration: 0.4,
                     ease: "power3.out",
                     overwrite: "auto"
+                });
+            });
+        });
+    }
+
+    // 6. Top Stock Cards — GSAP Hover Animation
+    const topStockCards = document.querySelectorAll('.tl-top-stock-card');
+
+    if (topStockCards.length > 0 && window.matchMedia("(hover: hover)").matches) {
+        const cs = getComputedStyle(document.documentElement);
+
+        topStockCards.forEach(card => {
+            // Create a flair element for the radial fill effect
+            const flair = document.createElement('span');
+            flair.className = 'tl-top-stock-flair';
+            flair.style.cssText = `
+                position: absolute;
+                top: 0; left: 0; right: 0; bottom: 0;
+                pointer-events: none;
+                z-index: 0;
+                transform: scale(0);
+                transform-origin: 0 0;
+                will-change: transform;
+            `;
+
+            // Inner circle for the radial fill
+            const flairInner = document.createElement('span');
+            flairInner.style.cssText = `
+                position: absolute;
+                top: 0; left: 0;
+                width: 200%;
+                aspect-ratio: 1/1;
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                pointer-events: none;
+            `;
+            flair.appendChild(flairInner);
+            card.style.position = 'relative';
+            card.insertBefore(flair, card.firstChild);
+
+            // Ensure card content stays above the flair
+            Array.from(card.children).forEach(child => {
+                if (child !== flair) {
+                    child.style.position = 'relative';
+                    child.style.zIndex = '1';
+                }
+            });
+
+            const xSet = gsap.quickSetter(flair, 'x', 'px');
+            const ySet = gsap.quickSetter(flair, 'y', 'px');
+
+            // Store original colors for reverting
+            const origBorderColor = cs.getPropertyValue('--tl-border').trim();
+            const purpleColor = cs.getPropertyValue('--tl-purple').trim();
+            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+
+            card.addEventListener('mouseenter', (e) => {
+                const rect = card.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
+
+                // Determine theme-appropriate colors
+                const currentIsLight = document.documentElement.getAttribute('data-theme') === 'light';
+                const bgFill = currentIsLight ? '#000000' : cs.getPropertyValue('--tl-purple').trim();
+                const textOnFill = '#FFFFFF';
+
+                flairInner.style.backgroundColor = bgFill;
+
+                gsap.to(flair, {
+                    scale: 1,
+                    duration: 0.45,
+                    ease: easeOut,
+                    overwrite: 'auto'
+                });
+
+                // Animate card border
+                gsap.to(card, {
+                    borderColor: bgFill,
+                    duration: 0.3,
+                    ease: easeOut,
+                    overwrite: 'auto'
+                });
+
+                // Animate text colors to stay visible on the purple fill
+                gsap.to(card.querySelectorAll('.tl-top-stock-symbol'), {
+                    color: '#FACC15',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-name'), {
+                    color: '#ffffff',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-footer'), {
+                    color: 'rgba(255,255,255,0.5)',
+                    borderColor: 'rgba(255,255,255,0.15)',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-view'), {
+                    color: '#FACC15',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-price'), {
+                    color: textOnFill,
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-change'), {
+                    color: textOnFill,
+                    backgroundColor: 'rgba(255,255,255,0.15)',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+            });
+
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
+            });
+
+            card.addEventListener('mouseleave', (e) => {
+                const rect = card.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
+
+                gsap.to(flair, {
+                    scale: 0,
+                    duration: 0.4,
+                    ease: easeOut,
+                    overwrite: 'auto'
+                });
+
+                // Revert card border
+                gsap.to(card, {
+                    borderColor: '',
+                    duration: 0.35,
+                    ease: easeOut,
+                    overwrite: 'auto',
+                    clearProps: 'borderColor'
+                });
+
+                // Revert text colors
+                gsap.to(card.querySelectorAll('.tl-top-stock-symbol'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-name'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-footer'), {
+                    color: '',
+                    borderColor: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color,borderColor'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-view'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-price'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-top-stock-change'), {
+                    color: '',
+                    backgroundColor: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color,backgroundColor'
                 });
             });
         });
