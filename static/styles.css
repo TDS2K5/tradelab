@@ -216,8 +216,11 @@ small,
 }
 
 .tl-sidebar-brand {
-    padding: 1rem 1rem 1rem;
+    /* padding: 1rem 1rem 1rem; */
+    padding: 1vh 1vh 1vh;
     border-bottom: 2px solid var(--tl-border);
+    border-top: 2px solid var(--tl-border);
+
 }
 
 .tl-sidebar-brand a {
