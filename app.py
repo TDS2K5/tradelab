@@ -69,6 +69,23 @@ def sparkline(symbol):
     return jsonify({"closes": closes})
 
 
+@app.route("/api/history/<symbol>")
+@login_required
+def api_history(symbol):
+    """Return close prices and dates for a given period as JSON."""
+    period = request.args.get("period", "1mo")
+    allowed = {"5d", "1mo", "3mo", "6mo", "1y", "2y", "5y", "max"}
+    if period not in allowed:
+        period = "1mo"
+    data = get_historical_data(symbol, period=period)
+    if not data or not data["records"]:
+        return jsonify({"closes": [], "dates": []})
+    closes = [r["close"] for r in data["records"]]
+    dates = [r["date"] for r in data["records"]]
+    return jsonify({"closes": closes, "dates": dates})
+
+
+
 @app.route("/buy", methods=["POST"])
 @login_required
 def buy():

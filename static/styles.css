@@ -763,8 +763,15 @@ small,
 
 @media (min-width: 768px) {
     .tl-quote-grid {
-        grid-template-columns: 1fr 320px;
+        grid-template-columns: 1fr 360px;
+        align-items: start;
     }
+}
+
+.tl-quote-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
 }
 
 .tl-price-large {
@@ -811,9 +818,78 @@ small,
 
 /* Trade Execution Widget */
 .tl-action-card {
-    position: sticky;
-    top: 1.5rem;
     border-top: 2px solid var(--tl-purple);
+}
+
+/* Quote Chart Card */
+.tl-chart-card {
+    border-top: 2px solid var(--tl-purple);
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 1 / 1;
+}
+
+.tl-chart-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem 0.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tl-chart-card-header h4 {
+    color: var(--tl-purple);
+    margin: 0;
+    font-size: 0.85rem;
+}
+
+.tl-chart-periods {
+    display: flex;
+    gap: 2px;
+}
+
+.tl-chart-card-body {
+    flex: 1;
+    padding: 0.25rem 0.75rem;
+    min-height: 0;
+    position: relative;
+}
+
+.tl-chart-card-body canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.tl-chart-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--tl-border);
+    font-family: var(--tl-font-mono);
+    font-size: 0.72rem;
+    color: var(--tl-text-dim);
+    text-transform: uppercase;
+}
+
+.tl-chart-range {
+    color: var(--tl-text-muted);
+}
+
+.tl-chart-change {
+    font-weight: 700;
+}
+
+/* Full-width historical data button */
+.tl-quote-history-btn {
+    margin-top: 1px;
+}
+
+.tl-quote-history-link {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1rem;
 }
 
 .tl-action-card h4 {
