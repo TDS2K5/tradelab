@@ -17,4 +17,46 @@
             </form>
         </div>
     </div>
+
+    {% if top_gainers %}
+    <div class="tl-top-stocks-section">
+        <div class="tl-top-stocks-header">
+            <div>
+                <h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 0.4rem; color: var(--tl-green);">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                        <polyline points="16 7 22 7 22 13"></polyline>
+                    </svg>
+                    Top Gainers This Month
+                </h3>
+                <p class="tl-top-stocks-sub">Best performing Nifty 50 stocks over the last 30 days</p>
+            </div>
+        </div>
+
+        <div class="tl-top-stocks-grid">
+            {% for gainer in top_gainers %}
+            <a href="/quote/{{ gainer.symbol }}" class="tl-top-stock-card" id="top-stock-{{ loop.index }}">
+                <div class="tl-top-stock-rank">#{{ loop.index }}</div>
+                <div class="tl-top-stock-info">
+                    <div class="tl-top-stock-symbol">{{ gainer.symbol | strip_suffix }}</div>
+                    <div class="tl-top-stock-name">{{ gainer.name }}</div>
+                </div>
+                <div class="tl-top-stock-price">₹{{ "%.2f" | format(gainer.price) }}</div>
+                <div class="tl-top-stock-change {% if gainer.change_pct >= 0 %}tl-top-stock-up{% else %}tl-top-stock-down{% endif %}">
+                    {% if gainer.change_pct >= 0 %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="18 15 12 9 6 15"></polyline>
+                    </svg>
+                    {% else %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                    {% endif %}
+                    {{ "%.2f" | format(gainer.change_pct) }}%
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 {% endblock %}

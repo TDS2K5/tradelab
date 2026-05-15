@@ -1433,3 +1433,145 @@ small,
     --color-surface-white: var(--tl-text);
     --color-just-black: var(--tl-base);
 }
+
+/* --- Top Stocks Section --- */
+.tl-top-stocks-section {
+    max-width: 1000px;
+    margin: 2.5rem auto 0;
+    padding: 0 1rem;
+}
+
+.tl-top-stocks-header {
+    margin-bottom: 1.25rem;
+}
+
+.tl-top-stocks-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--tl-text);
+    margin-bottom: 0.2rem;
+}
+
+.tl-top-stocks-sub {
+    font-size: 0.82rem;
+    color: var(--tl-text-muted);
+    margin: 0;
+}
+
+.tl-top-stocks-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+}
+
+.tl-top-stock-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    padding: 1.1rem 1rem;
+    background: var(--tl-surface);
+    border: 2px solid var(--tl-border);
+    text-decoration: none;
+    color: var(--tl-text);
+    transition: border-color 0.18s ease;
+    overflow: hidden;
+}
+
+.tl-top-stock-card:hover {
+    border-color: var(--tl-purple);
+    z-index: 1;
+}
+
+:root[data-theme="light"] .tl-top-stock-card:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.tl-top-stock-card:focus-visible {
+    outline-offset: -2px;
+}
+
+.tl-top-stock-rank {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.7rem;
+    font-family: var(--tl-font-mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--tl-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    opacity: 0.7;
+}
+
+.tl-top-stock-info {
+    min-width: 0;
+}
+
+.tl-top-stock-symbol {
+    font-family: var(--tl-font-mono);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--tl-yellow);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tl-top-stock-name {
+    font-size: 0.72rem;
+    color: var(--tl-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 0.1rem;
+    line-height: 1.3;
+}
+
+.tl-top-stock-price {
+    font-family: var(--tl-font-mono);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--tl-text);
+    margin-top: 0.25rem;
+}
+
+.tl-top-stock-change {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-family: var(--tl-font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 0;
+    width: fit-content;
+}
+
+.tl-top-stock-up {
+    color: var(--tl-green);
+    background: var(--tl-green-dim);
+}
+
+.tl-top-stock-down {
+    color: var(--tl-red);
+    background: var(--tl-red-dim);
+}
+
+/* Responsive: top stocks grid */
+@media (max-width: 900px) {
+    .tl-top-stocks-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .tl-top-stocks-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tl-top-stocks-section {
+        margin-top: 1.5rem;
+    }
+}

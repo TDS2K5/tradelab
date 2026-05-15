@@ -131,6 +131,81 @@ def search_stocks(query):
         return None
 
 
+def get_top_gainers():
+    """Fetch top 8 monthly gaining Indian stocks from a curated Nifty 50 watchlist."""
+    # Curated list of major Indian stocks to scan (Nifty 50 core + popular picks)
+    watchlist = [
+        "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS",
+        "HINDUNILVR.NS", "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS",
+        "LT.NS", "AXISBANK.NS", "WIPRO.NS", "HCLTECH.NS", "SUNPHARMA.NS",
+        "MARUTI.NS", "TRENT.NS", "BAJFINANCE.NS", "TITAN.NS", "NTPC.NS",
+        "POWERGRID.NS", "ONGC.NS", "TATASTEEL.NS", "JSWSTEEL.NS", "ADANIENT.NS",
+        "ADANIPORTS.NS", "ULTRACEMCO.NS", "TECHM.NS", "BAJAJFINSV.NS", "HDFCLIFE.NS",
+        "DRREDDY.NS", "CIPLA.NS", "APOLLOHOSP.NS", "TATACONSUM.NS", "COALINDIA.NS",
+    ]
+
+    # Pre-built name map — avoids 35 individual yf.Ticker().info calls
+    name_map = {
+        "RELIANCE.NS": "Reliance Industries", "TCS.NS": "Tata Consultancy",
+        "INFY.NS": "Infosys", "HDFCBANK.NS": "HDFC Bank",
+        "ICICIBANK.NS": "ICICI Bank", "HINDUNILVR.NS": "Hindustan Unilever",
+        "ITC.NS": "ITC Limited", "SBIN.NS": "State Bank of India",
+        "BHARTIARTL.NS": "Bharti Airtel", "KOTAKBANK.NS": "Kotak Mahindra Bank",
+        "LT.NS": "Larsen & Toubro", "AXISBANK.NS": "Axis Bank",
+        "WIPRO.NS": "Wipro", "HCLTECH.NS": "HCL Technologies",
+        "SUNPHARMA.NS": "Sun Pharma", "MARUTI.NS": "Maruti Suzuki",
+        "TRENT.NS": "Trent Limited", "BAJFINANCE.NS": "Bajaj Finance",
+        "TITAN.NS": "Titan Company", "NTPC.NS": "NTPC Limited",
+        "POWERGRID.NS": "Power Grid Corp", "ONGC.NS": "ONGC",
+        "TATASTEEL.NS": "Tata Steel", "JSWSTEEL.NS": "JSW Steel",
+        "ADANIENT.NS": "Adani Enterprises", "ADANIPORTS.NS": "Adani Ports",
+        "ULTRACEMCO.NS": "UltraTech Cement", "TECHM.NS": "Tech Mahindra",
+        "BAJAJFINSV.NS": "Bajaj Finserv", "HDFCLIFE.NS": "HDFC Life",
+        "DRREDDY.NS": "Dr. Reddy's Labs", "CIPLA.NS": "Cipla",
+        "APOLLOHOSP.NS": "Apollo Hospitals", "TATACONSUM.NS": "Tata Consumer",
+        "COALINDIA.NS": "Coal India",
+    }
+
+    try:
+        import yfinance as yf
+
+        # Batch download 1-month data for all symbols (single HTTP call)
+        data = yf.download(watchlist, period="1mo", group_by="ticker", progress=False, threads=True)
+
+        gainers = []
+        for symbol in watchlist:
+            try:
+                if symbol in data.columns.get_level_values(0):
+                    ticker_data = data[symbol]["Close"].dropna()
+                else:
+                    continue
+
+                if len(ticker_data) < 2:
+                    continue
+
+                first_close = float(ticker_data.iloc[0])
+                last_close = float(ticker_data.iloc[-1])
+                change_pct = ((last_close - first_close) / first_close) * 100
+
+                gainers.append({
+                    "symbol": symbol,
+                    "name": name_map.get(symbol, symbol.replace(".NS", "")),
+                    "price": round(last_close, 2),
+                    "change_pct": round(change_pct, 2),
+                    "prev_close": round(first_close, 2),
+                })
+            except Exception:
+                continue
+
+        # Sort by monthly % gain descending, take top 8
+        gainers.sort(key=lambda x: x["change_pct"], reverse=True)
+        return gainers[:8]
+
+    except Exception as e:
+        print(f"Error fetching top gainers: {e}")
+        return []
+
+
 def inr(value):
     """Format value as INR."""
     return f"₹{value:,.2f}"

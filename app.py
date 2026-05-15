@@ -4,7 +4,7 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, ses
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, login_required, lookup, inr, search_stocks, get_historical_data
+from helpers import apology, login_required, lookup, inr, search_stocks, get_historical_data, get_top_gainers
 from db import SQL
 
 # Configure application
@@ -213,7 +213,8 @@ def search():
     if request.method == "POST":
         query = request.form.get("query")
         return redirect(f"/search/{query}")
-    return render_template("search.html")
+    top_gainers = get_top_gainers()
+    return render_template("search.html", top_gainers=top_gainers)
 
 @app.route("/search/<query>")
 @login_required
