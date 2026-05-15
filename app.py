@@ -287,7 +287,10 @@ def sell():
         symbol = request.form.get("symbol")
         stock = lookup(symbol)
 
-        current_stock = db.execute("SELECT * FROM portfolio where stock = ?", symbol)
+        current_stock = db.execute("SELECT * FROM portfolio WHERE stock = ? AND user_id = ?", symbol, session["user_id"])
+
+        if not current_stock:
+            return apology("You don't own this stock", 400)
 
         try:
             shares = int(request.form.get("shares"))
@@ -300,7 +303,7 @@ def sell():
                 return apology("Please enter a valid shares value", 400)
 
         if current_stock[0]["shares"] - shares == 0:
-            db.execute("delete from portfolio where stock = ? ", symbol)
+            db.execute("DELETE FROM portfolio WHERE stock = ? AND user_id = ?", symbol, session["user_id"])
         else:
             db.execute("update portfolio set shares = shares - ? where user_id = ? and stock = ?",
                        shares, session["user_id"], symbol)
