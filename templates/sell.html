@@ -42,8 +42,34 @@
                     </select>
                 </div>
                 <div class="tl-form-group">
-                    <label class="tl-label" for="sell-shares">Shares</label>
-                    <input autocomplete="off" class="tl-input" id="sell-shares" min="1" name="shares" placeholder="QTY" type="number">
+                    <label class="tl-label" for="sell-shares" style="display: flex; justify-content: space-between; align-items: center;">
+                        Shares
+                        <span id="sell-owned-badge" style="
+                            display: none;
+                            font-family: var(--tl-font-mono);
+                            font-size: 0.7rem;
+                            font-weight: 600;
+                            color: var(--tl-text-muted);
+                            background: var(--tl-bg-tertiary, rgba(128,128,128,0.1));
+                            padding: 2px 8px;
+                            border-radius: 4px;
+                        ">You own <span id="sell-owned-count">0</span></span>
+                    </label>
+                    <input autocomplete="off" class="tl-input" id="sell-shares" min="1" name="shares" placeholder="QTY" type="number" oninput="updateSellTotal()">
+                </div>
+                <div id="sell-estimate" style="
+                    font-family: var(--tl-font-mono);
+                    font-size: 0.78rem;
+                    color: var(--tl-text-muted);
+                    margin-bottom: 0.75rem;
+                    padding: 0.4rem 0;
+                    border-top: 1px solid var(--tl-border);
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                ">
+                    <span>EST. TOTAL: <span id="sell-total" style="color: var(--tl-green); font-weight: 600; transition: color 0.2s ease;">₹0.00</span></span>
+                    <span id="sell-price-label" style="opacity: 0.6;"></span>
                 </div>
                 <button class="button button--stroke tl-btn-danger tl-btn-full" type="submit"><span class="button__flair"></span><span class="button__label">Sell</span></button>
             </form>
@@ -52,11 +78,107 @@
 
 
     <script>
+// Track current stock state
+let currentSellPrice = 0;
+let ownedShares = 0;
+
+// Fetch price + owned shares when user selects a stock
+document.getElementById('sell-symbol').addEventListener('change', function() {
+    const symbol = this.value;
+    const priceLabel = document.getElementById('sell-price-label');
+    const totalEl = document.getElementById('sell-total');
+    const ownedBadge = document.getElementById('sell-owned-badge');
+    const ownedCount = document.getElementById('sell-owned-count');
+    const sharesInput = document.getElementById('sell-shares');
+
+    // Reset while loading
+    currentSellPrice = 0;
+    ownedShares = 0;
+    totalEl.textContent = '₹0.00';
+    totalEl.style.color = 'var(--tl-green)';
+    priceLabel.textContent = 'Loading...';
+    ownedBadge.style.display = 'none';
+    sharesInput.removeAttribute('max');
+
+    fetch('/api/price/' + encodeURIComponent(symbol))
+        .then(r => r.json())
+        .then(data => {
+            if (data.price) {
+                currentSellPrice = data.price;
+                ownedShares = data.owned_shares || 0;
+
+                priceLabel.textContent = '@ ₹' + data.price.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                // Show owned shares badge
+                ownedCount.textContent = ownedShares;
+                ownedBadge.style.display = 'inline-block';
+
+                // Set max on the input
+                sharesInput.setAttribute('max', ownedShares);
+
+                updateSellTotal();
+            } else {
+                priceLabel.textContent = 'Price unavailable';
+            }
+        })
+        .catch(() => {
+            priceLabel.textContent = 'Error';
+        });
+});
+
+// Update est. total + validate shares against owned
+function updateSellTotal() {
+    const sharesInput = document.getElementById('sell-shares');
+    const shares = parseInt(sharesInput.value) || 0;
+    const totalEl = document.getElementById('sell-total');
+    const errorEl = document.getElementById('sell-error');
+    const errorText = document.getElementById('sell-error-text');
+
+    const total = (shares * currentSellPrice).toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    totalEl.textContent = '₹' + total;
+
+    // Client-side validation: shares exceeds owned
+    if (ownedShares > 0 && shares > ownedShares) {
+        totalEl.style.color = 'var(--tl-red)';
+        sharesInput.style.borderColor = 'var(--tl-red)';
+
+        // Show inline error
+        errorText.textContent = 'You only own ' + ownedShares + ' share' + (ownedShares !== 1 ? 's' : '') + ' of this stock.';
+        errorEl.style.display = 'flex';
+        requestAnimationFrame(() => {
+            errorEl.style.opacity = '1';
+            errorEl.style.transform = 'translateY(0)';
+        });
+    } else {
+        totalEl.style.color = 'var(--tl-green)';
+        sharesInput.style.borderColor = '';
+
+        // Hide error if it was showing from input validation
+        errorEl.style.opacity = '0';
+        errorEl.style.transform = 'translateY(-8px)';
+        setTimeout(() => { errorEl.style.display = 'none'; }, 300);
+    }
+}
+
+// Form submission handler
 document.getElementById('sell-form').addEventListener('submit', function(e) {
     e.preventDefault();
 
     const errorEl = document.getElementById('sell-error');
     const errorText = document.getElementById('sell-error-text');
+    const shares = parseInt(document.getElementById('sell-shares').value) || 0;
+
+    // Client-side block: don't even send request if over limit
+    if (ownedShares > 0 && shares > ownedShares) {
+        errorText.textContent = 'You only own ' + ownedShares + ' share' + (ownedShares !== 1 ? 's' : '') + ' of this stock.';
+        errorEl.style.display = 'flex';
+        requestAnimationFrame(() => {
+            errorEl.style.opacity = '1';
+            errorEl.style.transform = 'translateY(0)';
+        });
+        return;
+    }
+
     const formData = new FormData(this);
 
     // Hide any previous error
@@ -75,7 +197,6 @@ document.getElementById('sell-form').addEventListener('submit', function(e) {
             errorText.textContent = data.error;
             errorEl.style.display = 'flex';
 
-            // Trigger reflow then animate in
             requestAnimationFrame(() => {
                 errorEl.style.opacity = '1';
                 errorEl.style.transform = 'translateY(0)';
@@ -98,3 +219,4 @@ document.getElementById('sell-form').addEventListener('submit', function(e) {
 });
 </script>
 {% endblock %}
+

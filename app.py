@@ -284,6 +284,19 @@ def register():
         return render_template("register.html")
 
 
+
+@app.route("/api/price/<symbol>")
+@login_required
+def api_price(symbol):
+    """Return current price and owned shares for a symbol as JSON."""
+    stock = lookup(symbol)
+    if not stock:
+        return jsonify({"error": "Stock not found"}), 404
+    held = db.execute("SELECT shares FROM portfolio WHERE user_id = ? AND stock = ?", session["user_id"], symbol)
+    owned_shares = held[0]["shares"] if held else 0
+    return jsonify({"price": stock["price"], "owned_shares": owned_shares})
+
+
 @app.route("/sell", methods=["GET", "POST"])
 @login_required
 def sell():
