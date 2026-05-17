@@ -317,8 +317,9 @@ def sell():
         else:
             if shares < 1:
                 return apology("Please enter a valid shares value", 400)
+            
             elif shares > current_stock[0]["shares"]:
-                return apology("Please enter a valid shares value", 400)
+                return jsonify({"error": f"You only own {current_stock[0]['shares']} shares of this stock."}), 400
 
         if current_stock[0]["shares"] - shares == 0:
             db.execute("DELETE FROM portfolio WHERE stock = ? AND user_id = ?", symbol, session["user_id"])
@@ -330,6 +331,6 @@ def sell():
                    session["user_id"], symbol, f"-{shares}", inr(float(stock["price"])))
         db.execute("update users set cash = cash + ? where id = ?",
                    float(stock["price"]) * shares, session["user_id"])
-        return redirect("/")
+        return jsonify({"status": "success"})
 
     return render_template("sell.html", symbols=symbols)
