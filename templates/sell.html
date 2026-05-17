@@ -139,6 +139,7 @@ function updateSellTotal() {
 
     // Client-side validation: shares exceeds owned
     if (ownedShares > 0 && shares > ownedShares) {
+        totalEl.textContent = '-';
         totalEl.style.color = 'var(--tl-red)';
         sharesInput.style.borderColor = 'var(--tl-red)';
 
