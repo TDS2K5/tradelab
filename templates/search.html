@@ -22,8 +22,8 @@
         </div>
     </div>
 
-    {% if top_gainers %}
-    <div class="tl-top-stocks-section">
+    <!-- Top Gainers — loaded asynchronously -->
+    <div class="tl-top-stocks-section" id="top-gainers-section" style="display: none;">
         <div class="tl-top-stocks-header">
             <div>
                 <h3>
@@ -36,102 +36,133 @@
                 <p class="tl-top-stocks-sub">Best performing Nifty 50 stocks over the last 30 days</p>
             </div>
         </div>
-
-        <div class="tl-top-stocks-grid">
-            {% for gainer in top_gainers %}
-            <a href="/quote/{{ gainer.symbol }}" class="tl-top-stock-card" id="top-stock-{{ loop.index }}">
-                <div class="tl-top-stock-header">
-                    <div class="tl-top-stock-info">
-                        <div class="tl-top-stock-symbol">{{ gainer.symbol | strip_suffix }}</div>
-                        <div class="tl-top-stock-name">{{ gainer.name }}</div>
-                    </div>
-                    <div class="tl-top-stock-change {% if gainer.change_pct >= 0 %}tl-top-stock-up{% else %}tl-top-stock-down{% endif %}">
-                        {% if gainer.change_pct >= 0 %}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="18 15 12 9 6 15"></polyline>
-                        </svg>
-                        {% else %}
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="6 9 12 15 18 9"></polyline>
-                        </svg>
-                        {% endif %}
-                        {{ "%.2f" | format(gainer.change_pct) }}%
-                    </div>
-                </div>
-
-                <div class="tl-top-stock-price">₹{{ "%.2f" | format(gainer.price) }}</div>
-
-                <div class="tl-top-stock-chart">
-                    <canvas id="top-spark-{{ loop.index }}"></canvas>
-                </div>
-
-                <!-- <div class="tl-top-stock-footer">
-                    <span></span>
-                    <span class="tl-top-stock-view">View →</span>
-                </div> -->
-            </a>
-            {% endfor %}
-        </div>
+        <div class="tl-top-stocks-grid" id="top-gainers-grid"></div>
     </div>
 
-    <div id="top-gainers-data" data-gainers='{{ top_gainers | tojson | safe }}' style="display: none;"></div>
+    <!-- Loading indicator -->
+    <div id="top-gainers-loading" class="tl-top-stocks-section" style="text-align: center; padding: 2rem 0;">
+        <p class="tl-top-stocks-sub" style="color: var(--tl-text-muted);">Loading top gainers…</p>
+    </div>
+
     <script>
     (function () {
-        const dataEl = document.getElementById('top-gainers-data');
-        if (!dataEl) return;
-        const gainers = JSON.parse(dataEl.getAttribute('data-gainers'));
-        const cs = getComputedStyle(document.documentElement);
-        const green = cs.getPropertyValue('--tl-green').trim();
-        const red = cs.getPropertyValue('--tl-red').trim();
+        var section = document.getElementById('top-gainers-section');
+        var grid = document.getElementById('top-gainers-grid');
+        var loading = document.getElementById('top-gainers-loading');
 
-        gainers.forEach(function (gainer, i) {
-            const canvasId = 'top-spark-' + (i + 1);
-            const canvas = document.getElementById(canvasId);
-            if (!canvas) return;
+        function stripSuffix(s) {
+            return s.replace('.NS', '').replace('.BO', '');
+        }
 
-            fetch('/api/sparkline/' + encodeURIComponent(gainer.symbol))
-                .then(function (r) { return r.json(); })
-                .then(function (data) {
-                    if (!data.closes || data.closes.length < 2) {
-                        canvas.parentElement.style.display = 'none';
-                        return;
-                    }
+        fetch('/api/top-gainers')
+            .then(function (r) { return r.json(); })
+            .then(function (gainers) {
+                if (!gainers || gainers.length === 0) {
+                    loading.style.display = 'none';
+                    return;
+                }
 
-                    var closes = data.closes;
-                    var isUp = closes[closes.length - 1] >= closes[0];
-                    var lineColor = isUp ? green : red;
+                // Build cards
+                gainers.forEach(function (g, i) {
+                    var idx = i + 1;
+                    var isUp = g.change_pct >= 0;
+                    var changeClass = isUp ? 'tl-top-stock-up' : 'tl-top-stock-down';
+                    var arrowSvg = isUp
+                        ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>'
+                        : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
 
-                    var ctx = canvas.getContext('2d');
-
-                    new Chart(ctx, {
-                        type: 'line',
-                        data: {
-                            labels: closes.map(function (_, j) { return j; }),
-                            datasets: [{
-                                data: closes,
-                                borderColor: lineColor,
-                                borderWidth: 1.5,
-                                fill: false,
-                                tension: 0.4,
-                                pointRadius: 0,
-                                pointHoverRadius: 0
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: { legend: { display: false }, tooltip: { enabled: false } },
-                            scales: { x: { display: false }, y: { display: false } },
-                            elements: { line: { borderJoinStyle: 'round' } },
-                            animation: false
-                        }
-                    });
-                })
-                .catch(function () {
-                    canvas.parentElement.style.display = 'none';
+                    var card = document.createElement('a');
+                    card.href = '/quote/' + g.symbol;
+                    card.className = 'tl-top-stock-card';
+                    card.id = 'top-stock-' + idx;
+                    card.innerHTML =
+                        '<div class="tl-top-stock-header">' +
+                            '<div class="tl-top-stock-info">' +
+                                '<div class="tl-top-stock-symbol">' + stripSuffix(g.symbol) + '</div>' +
+                                '<div class="tl-top-stock-name">' + g.name + '</div>' +
+                            '</div>' +
+                            '<div class="tl-top-stock-change ' + changeClass + '">' +
+                                arrowSvg + ' ' + g.change_pct.toFixed(2) + '%' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="tl-top-stock-price">₹' + g.price.toFixed(2) + '</div>' +
+                        '<div class="tl-top-stock-chart">' +
+                            '<canvas id="top-spark-' + idx + '"></canvas>' +
+                        '</div>';
+                    grid.appendChild(card);
                 });
-        });
+
+                // Show section, hide loading
+                loading.style.display = 'none';
+                section.style.display = '';
+
+                // Initialize GSAP hover effects on the newly created cards
+                if (typeof gsap !== 'undefined' && window.matchMedia("(hover: hover)").matches) {
+                    if (typeof initStockCardHovers === 'function') {
+                        initStockCardHovers();
+                    }
+                }
+
+                // Initialize button flair on any new buttons
+                if (typeof gsap !== 'undefined') {
+                    if (typeof initButtonFlairs === 'function') {
+                        initButtonFlairs();
+                    }
+                }
+
+                // Load sparklines
+                var cs = getComputedStyle(document.documentElement);
+                var green = cs.getPropertyValue('--tl-green').trim();
+                var red = cs.getPropertyValue('--tl-red').trim();
+
+                gainers.forEach(function (g, i) {
+                    var canvas = document.getElementById('top-spark-' + (i + 1));
+                    if (!canvas) return;
+
+                    fetch('/api/sparkline/' + encodeURIComponent(g.symbol))
+                        .then(function (r) { return r.json(); })
+                        .then(function (data) {
+                            if (!data.closes || data.closes.length < 2) {
+                                canvas.parentElement.style.display = 'none';
+                                return;
+                            }
+                            var closes = data.closes;
+                            var isUp = closes[closes.length - 1] >= closes[0];
+                            var lineColor = isUp ? green : red;
+                            var ctx = canvas.getContext('2d');
+
+                            new Chart(ctx, {
+                                type: 'line',
+                                data: {
+                                    labels: closes.map(function (_, j) { return j; }),
+                                    datasets: [{
+                                        data: closes,
+                                        borderColor: lineColor,
+                                        borderWidth: 1.5,
+                                        fill: false,
+                                        tension: 0.4,
+                                        pointRadius: 0,
+                                        pointHoverRadius: 0
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                                    scales: { x: { display: false }, y: { display: false } },
+                                    elements: { line: { borderJoinStyle: 'round' } },
+                                    animation: false
+                                }
+                            });
+                        })
+                        .catch(function () {
+                            canvas.parentElement.style.display = 'none';
+                        });
+                });
+            })
+            .catch(function () {
+                loading.innerHTML = '<p class="tl-top-stocks-sub" style="color: var(--tl-text-dim);">Could not load top gainers.</p>';
+            });
     })();
     </script>
-    {% endif %}
 {% endblock %}

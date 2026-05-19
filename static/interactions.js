@@ -15,50 +15,52 @@ document.addEventListener("DOMContentLoaded", () => {
     const easeOut = "power2.out";
 
     // 2. Button Hover System (Cursor-Follow Flair)
-    const buttons = document.querySelectorAll('.button--stroke, .tl-sidebar-nav a, .tl-sidebar-footer a, .tl-theme-toggle');
+    window.initButtonFlairs = function () {
+        const buttons = document.querySelectorAll('.button--stroke, .tl-sidebar-nav a, .tl-sidebar-footer a, .tl-theme-toggle');
 
-    buttons.forEach(btn => {
-        const flair = btn.querySelector('.button__flair');
-        if (!flair) return;
+        buttons.forEach(btn => {
+            if (btn._flairInit) return;
+            btn._flairInit = true;
+            const flair = btn.querySelector('.button__flair');
+            if (!flair) return;
 
-        // Create quickSetters for better performance (60fps)
-        const xSet = gsap.quickSetter(flair, 'x', 'px');
-        const ySet = gsap.quickSetter(flair, 'y', 'px');
+            const xSet = gsap.quickSetter(flair, 'x', 'px');
+            const ySet = gsap.quickSetter(flair, 'y', 'px');
 
-        btn.addEventListener('mouseenter', (e) => {
-            const rect = btn.getBoundingClientRect();
-            // Start the flair at the cursor position
-            xSet(e.clientX - rect.left);
-            ySet(e.clientY - rect.top);
+            btn.addEventListener('mouseenter', (e) => {
+                const rect = btn.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
 
-            gsap.to(flair, {
-                scale: 1,
-                duration: 0.4,
-                ease: easeOut,
-                overwrite: "auto"
+                gsap.to(flair, {
+                    scale: 1,
+                    duration: 0.4,
+                    ease: easeOut,
+                    overwrite: "auto"
+                });
+            });
+
+            btn.addEventListener('mousemove', (e) => {
+                const rect = btn.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
+            });
+
+            btn.addEventListener('mouseleave', (e) => {
+                const rect = btn.getBoundingClientRect();
+                xSet(e.clientX - rect.left);
+                ySet(e.clientY - rect.top);
+
+                gsap.to(flair, {
+                    scale: 0,
+                    duration: 0.4,
+                    ease: easeOut,
+                    overwrite: "auto"
+                });
             });
         });
-
-        btn.addEventListener('mousemove', (e) => {
-            const rect = btn.getBoundingClientRect();
-            // Follow cursor smoothly
-            xSet(e.clientX - rect.left);
-            ySet(e.clientY - rect.top);
-        });
-
-        btn.addEventListener('mouseleave', (e) => {
-            const rect = btn.getBoundingClientRect();
-            xSet(e.clientX - rect.left);
-            ySet(e.clientY - rect.top);
-
-            gsap.to(flair, {
-                scale: 0,
-                duration: 0.4,
-                ease: easeOut,
-                overwrite: "auto"
-            });
-        });
-    });
+    };
+    initButtonFlairs();
 
     // 3. Magnetic Hover System (for links, cards, icons, nav items)
     // Avoid magnetic effect on mobile where hover doesn't make sense
@@ -163,12 +165,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 6. Stock Cards — GSAP Hover Animation (Top Gainers + Portfolio)
-    const allStockCards = document.querySelectorAll('.tl-top-stock-card, .tl-stock-card');
+    window.initStockCardHovers = function () {
+        const allStockCards = document.querySelectorAll('.tl-top-stock-card, .tl-stock-card');
+        if (allStockCards.length === 0) return;
 
-    if (allStockCards.length > 0 && window.matchMedia("(hover: hover)").matches) {
         const cs = getComputedStyle(document.documentElement);
 
         allStockCards.forEach(card => {
+            if (card._hoverInit) return;
+            card._hoverInit = true;
+
             // Create a flair element for the radial fill effect
             const flair = document.createElement('span');
             flair.className = 'tl-top-stock-flair';
@@ -213,7 +219,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 xSet(e.clientX - rect.left);
                 ySet(e.clientY - rect.top);
 
-                // Determine theme-appropriate colors
                 const currentIsLight = document.documentElement.getAttribute('data-theme') === 'light';
                 const bgFill = currentIsLight ? '#000000' : cs.getPropertyValue('--tl-purple').trim();
                 const textOnFill = '#FFFFFF';
@@ -227,7 +232,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     overwrite: 'auto'
                 });
 
-                // Animate card border
                 gsap.to(card, {
                     borderColor: bgFill,
                     duration: 0.3,
@@ -235,7 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     overwrite: 'auto'
                 });
 
-                // Animate text colors — target both top-stock and portfolio-stock selectors
                 gsap.to(card.querySelectorAll('.tl-top-stock-symbol, .tl-stock-card-symbol'), {
                     color: '#FACC15',
                     duration: 0.3,
@@ -292,7 +295,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     overwrite: 'auto'
                 });
 
-                // Revert card border
                 gsap.to(card, {
                     borderColor: '',
                     duration: 0.35,
@@ -301,7 +303,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearProps: 'borderColor'
                 });
 
-                // Revert text colors — both card types
                 gsap.to(card.querySelectorAll('.tl-top-stock-symbol, .tl-stock-card-symbol'), {
                     color: '',
                     duration: 0.3,
@@ -346,5 +347,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
             });
         });
+    };
+
+    // Run on initial load
+    if (window.matchMedia("(hover: hover)").matches) {
+        initStockCardHovers();
     }
 });

@@ -40,14 +40,46 @@ def index():
     stocks = db.execute(
         "SELECT stock, shares FROM portfolio where user_id = ?", session["user_id"])
     print(stocks)
+
+    # Filter valid stocks
+    valid_stocks = [s for s in stocks if s.get("stock")]
+    symbols = [s["stock"] for s in valid_stocks]
+
+    # Batch-fetch current prices in a single call instead of N serial lookup() calls
+    prices = {}
+    if symbols:
+        try:
+            import yfinance as yf
+            batch = yf.download(symbols, period="1d", progress=False, threads=True)
+            if len(symbols) == 1:
+                # yf.download returns flat columns for a single symbol
+                last_close = batch["Close"].dropna()
+                if not last_close.empty:
+                    prices[symbols[0]] = float(last_close.iloc[-1])
+            else:
+                for sym in symbols:
+                    try:
+                        col = batch[("Close", sym)].dropna()
+                        if not col.empty:
+                            prices[sym] = float(col.iloc[-1])
+                    except Exception:
+                        pass
+        except Exception as e:
+            print(f"Batch price fetch error: {e}")
+
+    # Fall back to individual lookup for any missing prices
+    for sym in symbols:
+        if sym not in prices:
+            info = lookup(sym)
+            if info and info.get("price"):
+                prices[sym] = float(info["price"])
+
     total_price = 0
-    for stock in stocks:
-        # if stock row has no stock value skip
-        if stock.get("stock") is None:
-            continue
-        price = float(lookup(stock["stock"])["price"])
+    for stock in valid_stocks:
+        sym = stock["stock"]
+        price = prices.get(sym, 0)
         total_price += price * stock["shares"]
-        all_stocks.append({"stock": stock["stock"], "shares": stock["shares"], "price": inr(
+        all_stocks.append({"stock": sym, "shares": stock["shares"], "price": inr(
             price), "raw_price": price, "total_price": inr(price * stock["shares"])})
 
     cash_row = db.execute("select cash from users where id = ?", session["user_id"])
@@ -230,8 +262,16 @@ def search():
     if request.method == "POST":
         query = request.form.get("query")
         return redirect(f"/search/{query}")
-    top_gainers = get_top_gainers()
-    return render_template("search.html", top_gainers=top_gainers)
+    # Render page immediately — top gainers load async via /api/top-gainers
+    return render_template("search.html")
+
+
+@app.route("/api/top-gainers")
+@login_required
+def api_top_gainers():
+    """Return top monthly gainers as JSON (loaded async by the search page)."""
+    gainers = get_top_gainers()
+    return jsonify(gainers)
 
 @app.route("/search/<query>")
 @login_required
