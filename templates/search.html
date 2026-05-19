@@ -102,9 +102,6 @@
                     var lineColor = isUp ? green : red;
 
                     var ctx = canvas.getContext('2d');
-                    var gradient = ctx.createLinearGradient(0, 0, 0, 64);
-                    gradient.addColorStop(0, isUp ? 'rgba(74,222,128,0.2)' : 'rgba(248,113,113,0.2)');
-                    gradient.addColorStop(1, 'rgba(0,0,0,0)');
 
                     new Chart(ctx, {
                         type: 'line',
@@ -113,9 +110,8 @@
                             datasets: [{
                                 data: closes,
                                 borderColor: lineColor,
-                                backgroundColor: gradient,
                                 borderWidth: 1.5,
-                                fill: true,
+                                fill: false,
                                 tension: 0.4,
                                 pointRadius: 0,
                                 pointHoverRadius: 0

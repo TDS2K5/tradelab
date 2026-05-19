@@ -81,12 +81,6 @@ extra_head %}
           const lineColor = isUp ? green : red;
 
           const ctx = canvas.getContext("2d");
-          const gradient = ctx.createLinearGradient(0, 0, 0, 64);
-          gradient.addColorStop(
-            0,
-            isUp ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)",
-          );
-          gradient.addColorStop(1, "rgba(0,0,0,0)");
 
           new Chart(ctx, {
             type: "line",
@@ -96,9 +90,8 @@ extra_head %}
                 {
                   data: closes,
                   borderColor: lineColor,
-                  backgroundColor: gradient,
                   borderWidth: 1.5,
-                  fill: true,
+                  fill: false,
                   tension: 0.4,
                   pointRadius: 0,
                   pointHoverRadius: 0,
