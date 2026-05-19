@@ -1,8 +1,31 @@
 import requests
+import time
 
 from flask import redirect, render_template, session
 from functools import wraps
 import yfinance as yf
+
+
+# --- Simple TTL Cache ---
+_cache = {}
+
+def cache_get(key, ttl):
+    """Return cached value if it exists and hasn't expired, else None."""
+    if key in _cache:
+        value, timestamp = _cache[key]
+        if time.time() - timestamp < ttl:
+            return value
+    return None
+
+def cache_set(key, value):
+    """Store a value in the cache with the current timestamp."""
+    _cache[key] = (value, time.time())
+
+# Cache TTLs (seconds)
+CACHE_TTL_SPARKLINE = 300   # 5 minutes
+CACHE_TTL_LOOKUP = 120      # 2 minutes
+CACHE_TTL_HISTORY = 300     # 5 minutes
+CACHE_TTL_TOP_GAINERS = 600 # 10 minutes
 
 
 def apology(message, code=400):
@@ -36,12 +59,17 @@ def search_stocks(query):
 
 
 def lookup(symbol):
-    """Look up quote for symbol using yfinance."""
+    """Look up quote for symbol using yfinance (cached)."""
+    cache_key = f"lookup:{symbol}"
+    cached = cache_get(cache_key, CACHE_TTL_LOOKUP)
+    if cached is not None:
+        return cached
+
     try:
         stock = yf.Ticker(symbol)
         info = stock.info
         print(info)
-        return {
+        result = {
             "name": info.get("shortName"),
             "price": info.get("currentPrice"),
             "symbol": symbol.upper(),
@@ -52,24 +80,23 @@ def lookup(symbol):
             "summary": info.get("longBusinessSummary"),
             "officers": info.get("companyOfficers"),
         }
+        cache_set(cache_key, result)
+        return result
     except Exception as e:
         print(f"Error looking up stock: {e}")
         return None
 
 
 def get_historical_data(symbol, start_date=None, end_date=None, period="1y"):
-    """Fetch historical stock data using yfinance.
+    """Fetch historical stock data using yfinance (cached for period-based requests)."""
+    # Only cache period-based requests (not custom date ranges)
+    cache_key = None
+    if not start_date and not end_date:
+        cache_key = f"history:{symbol}:{period}"
+        cached = cache_get(cache_key, CACHE_TTL_HISTORY)
+        if cached is not None:
+            return cached
 
-    Args:
-        symbol: Stock ticker symbol
-        start_date: Start date string (YYYY-MM-DD). If provided with end_date, overrides period.
-        end_date: End date string (YYYY-MM-DD). If provided with start_date, overrides period.
-        period: Time period string (e.g. '1mo', '3mo', '6mo', '1y', '2y', '5y', 'max').
-                Used only when start_date/end_date are not provided.
-
-    Returns:
-        dict with 'records' (list of dicts) and 'symbol', or None on error.
-    """
     try:
         stock = yf.Ticker(symbol)
 
@@ -93,11 +120,14 @@ def get_historical_data(symbol, start_date=None, end_date=None, period="1y"):
                 "volume": int(row["Volume"]),
             })
 
-        return {
+        result = {
             "symbol": symbol.upper(),
             "records": records,
             "total_records": len(records),
         }
+        if cache_key:
+            cache_set(cache_key, result)
+        return result
     except Exception as e:
         print(f"Error fetching historical data: {e}")
         return None
@@ -132,7 +162,12 @@ def search_stocks(query):
 
 
 def get_top_gainers():
-    """Fetch top 8 monthly gaining Indian stocks from a curated Nifty 50 watchlist."""
+    """Fetch top 8 monthly gaining Indian stocks from a curated Nifty 50 watchlist (cached)."""
+    cache_key = "top_gainers"
+    cached = cache_get(cache_key, CACHE_TTL_TOP_GAINERS)
+    if cached is not None:
+        return cached
+
     # Curated list of major Indian stocks to scan (Nifty 50 core + popular picks)
     watchlist = [
         "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS",
@@ -197,9 +232,11 @@ def get_top_gainers():
             except Exception:
                 continue
 
-        # Sort by monthly % gain descending, take top 8
+        # Sort by monthly % gain descending, take top 10
         gainers.sort(key=lambda x: x["change_pct"], reverse=True)
-        return gainers[:10]
+        result = gainers[:10]
+        cache_set(cache_key, result)
+        return result
 
     except Exception as e:
         print(f"Error fetching top gainers: {e}")

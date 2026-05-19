@@ -101,6 +101,27 @@ def sparkline(symbol):
     return jsonify({"closes": closes})
 
 
+@app.route("/api/sparklines")
+@login_required
+def sparklines_batch():
+    """Return 1-month close prices for multiple symbols in one request.
+    Usage: /api/sparklines?symbols=TCS.NS,INFY.NS,RELIANCE.NS
+    """
+    symbols_param = request.args.get("symbols", "")
+    symbols = [s.strip() for s in symbols_param.split(",") if s.strip()]
+    if not symbols:
+        return jsonify({})
+
+    result = {}
+    for sym in symbols:
+        data = get_historical_data(sym, period="1mo")
+        if data and data["records"]:
+            result[sym] = [r["close"] for r in data["records"]]
+        else:
+            result[sym] = []
+    return jsonify(result)
+
+
 @app.route("/api/history/<symbol>")
 @login_required
 def api_history(symbol):

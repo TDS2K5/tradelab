@@ -59,27 +59,26 @@ extra_head %}
     const dataEl = document.getElementById("portfolio-data");
     const chartStocks = JSON.parse(dataEl.getAttribute("data-stocks"));
     const cs = getComputedStyle(document.documentElement);
-    const purple = cs.getPropertyValue("--tl-purple").trim();
     const red = cs.getPropertyValue("--tl-red").trim();
     const green = cs.getPropertyValue("--tl-green").trim();
 
-    chartStocks.forEach(function (stock, i) {
-      const canvasId = "spark-" + (i + 1);
-      const canvas = document.getElementById(canvasId);
-      if (!canvas) return;
+    // Batch fetch all sparklines in one request
+    const symbols = chartStocks.map(s => s.stock).join(",");
+    fetch("/api/sparklines?symbols=" + encodeURIComponent(symbols))
+      .then(r => r.json())
+      .then(allData => {
+        chartStocks.forEach(function (stock, i) {
+          const canvas = document.getElementById("spark-" + (i + 1));
+          if (!canvas) return;
 
-      fetch("/api/sparkline/" + encodeURIComponent(stock.stock))
-        .then((r) => r.json())
-        .then((data) => {
-          if (!data.closes || data.closes.length < 2) {
+          const closes = allData[stock.stock];
+          if (!closes || closes.length < 2) {
             canvas.parentElement.style.display = "none";
             return;
           }
 
-          const closes = data.closes;
           const isUp = closes[closes.length - 1] >= closes[0];
           const lineColor = isUp ? green : red;
-
           const ctx = canvas.getContext("2d");
 
           new Chart(ctx, {
@@ -113,11 +112,15 @@ extra_head %}
               animation: false,
             },
           });
-        })
-        .catch(() => {
-          canvas.parentElement.style.display = "none";
         });
-    });
+      })
+      .catch(() => {
+        // Hide all charts on error
+        chartStocks.forEach(function (_, i) {
+          const canvas = document.getElementById("spark-" + (i + 1));
+          if (canvas) canvas.parentElement.style.display = "none";
+        });
+      });
   })();
 </script>
 
