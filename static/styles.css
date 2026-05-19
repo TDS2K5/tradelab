@@ -1245,23 +1245,17 @@ small,
     border: 2px solid var(--tl-border);
     padding: 0;
     overflow: hidden;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
     aspect-ratio: 1 / 1;
     display: flex;
     flex-direction: column;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    color: var(--tl-text);
+    cursor: pointer;
+    position: relative;
 }
 
 :root[data-theme="light"] .tl-stock-card {
-    box-shadow: none;
-}
-
-.tl-stock-card:hover {
-    border-color: var(--tl-border-bright);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-:root[data-theme="light"] .tl-stock-card:hover {
     box-shadow: none;
 }
 
@@ -1276,19 +1270,8 @@ small,
     font-family: var(--tl-font-mono);
     font-weight: 700;
     font-size: 1rem;
-}
-
-.tl-stock-card-symbol a {
     color: var(--tl-yellow);
-    text-decoration: none;
-}
-
-.tl-stock-card-symbol a:hover {
-    text-decoration: underline;
-}
-
-.tl-stock-card-symbol a:focus-visible {
-    outline-offset: 2px;
+    letter-spacing: 0.02em;
 }
 
 .tl-stock-card-shares {
@@ -1321,9 +1304,10 @@ small,
 }
 
 .tl-stock-card-chart {
-    height: 64px;
+    flex: 1;
     padding: 0.5rem 0.5rem 0.25rem;
     opacity: 0.85;
+    min-height: 0;
 }
 
 .tl-stock-card-chart canvas {

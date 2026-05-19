@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Magnetic Hover System (for links, cards, icons, nav items)
     // Avoid magnetic effect on mobile where hover doesn't make sense
     if (window.matchMedia("(hover: hover)").matches) {
-        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a):not(.tl-top-stock-card), .hover-target');
+        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a):not(.tl-top-stock-card):not(.tl-stock-card), .hover-target');
 
         magneticElements.forEach(el => {
             el.addEventListener('mousemove', (e) => {
@@ -162,13 +162,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // 6. Top Stock Cards — GSAP Hover Animation
-    const topStockCards = document.querySelectorAll('.tl-top-stock-card');
+    // 6. Stock Cards — GSAP Hover Animation (Top Gainers + Portfolio)
+    const allStockCards = document.querySelectorAll('.tl-top-stock-card, .tl-stock-card');
 
-    if (topStockCards.length > 0 && window.matchMedia("(hover: hover)").matches) {
+    if (allStockCards.length > 0 && window.matchMedia("(hover: hover)").matches) {
         const cs = getComputedStyle(document.documentElement);
 
-        topStockCards.forEach(card => {
+        allStockCards.forEach(card => {
             // Create a flair element for the radial fill effect
             const flair = document.createElement('span');
             flair.className = 'tl-top-stock-flair';
@@ -208,11 +208,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const xSet = gsap.quickSetter(flair, 'x', 'px');
             const ySet = gsap.quickSetter(flair, 'y', 'px');
 
-            // Store original colors for reverting
-            const origBorderColor = cs.getPropertyValue('--tl-border').trim();
-            const purpleColor = cs.getPropertyValue('--tl-purple').trim();
-            const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-
             card.addEventListener('mouseenter', (e) => {
                 const rect = card.getBoundingClientRect();
                 xSet(e.clientX - rect.left);
@@ -240,33 +235,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     overwrite: 'auto'
                 });
 
-                // Animate text colors to stay visible on the purple fill
-                gsap.to(card.querySelectorAll('.tl-top-stock-symbol'), {
+                // Animate text colors — target both top-stock and portfolio-stock selectors
+                gsap.to(card.querySelectorAll('.tl-top-stock-symbol, .tl-stock-card-symbol'), {
                     color: '#FACC15',
                     duration: 0.3,
                     ease: easeOut
                 });
 
-                gsap.to(card.querySelectorAll('.tl-top-stock-name'), {
+                gsap.to(card.querySelectorAll('.tl-top-stock-name, .tl-stock-card-shares'), {
                     color: '#ffffff',
                     duration: 0.3,
                     ease: easeOut
                 });
 
-                gsap.to(card.querySelectorAll('.tl-top-stock-footer'), {
-                    color: 'rgba(255,255,255,0.5)',
-                    borderColor: 'rgba(255,255,255,0.15)',
-                    duration: 0.3,
-                    ease: easeOut
-                });
-
-                gsap.to(card.querySelectorAll('.tl-top-stock-view'), {
-                    color: '#FACC15',
-                    duration: 0.3,
-                    ease: easeOut
-                });
-
-                gsap.to(card.querySelectorAll('.tl-top-stock-price'), {
+                gsap.to(card.querySelectorAll('.tl-top-stock-price, .tl-stock-card-price'), {
                     color: textOnFill,
                     duration: 0.3,
                     ease: easeOut
@@ -275,6 +257,18 @@ document.addEventListener("DOMContentLoaded", () => {
                 gsap.to(card.querySelectorAll('.tl-top-stock-change'), {
                     color: textOnFill,
                     backgroundColor: 'rgba(255,255,255,0.15)',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-stock-card-total'), {
+                    color: 'rgba(255,255,255,0.7)',
+                    duration: 0.3,
+                    ease: easeOut
+                });
+
+                gsap.to(card.querySelectorAll('.tl-stock-card-total span'), {
+                    color: '#FACC15',
                     duration: 0.3,
                     ease: easeOut
                 });
@@ -307,37 +301,22 @@ document.addEventListener("DOMContentLoaded", () => {
                     clearProps: 'borderColor'
                 });
 
-                // Revert text colors
-                gsap.to(card.querySelectorAll('.tl-top-stock-symbol'), {
+                // Revert text colors — both card types
+                gsap.to(card.querySelectorAll('.tl-top-stock-symbol, .tl-stock-card-symbol'), {
                     color: '',
                     duration: 0.3,
                     ease: easeOut,
                     clearProps: 'color'
                 });
 
-                gsap.to(card.querySelectorAll('.tl-top-stock-name'), {
+                gsap.to(card.querySelectorAll('.tl-top-stock-name, .tl-stock-card-shares'), {
                     color: '',
                     duration: 0.3,
                     ease: easeOut,
                     clearProps: 'color'
                 });
 
-                gsap.to(card.querySelectorAll('.tl-top-stock-footer'), {
-                    color: '',
-                    borderColor: '',
-                    duration: 0.3,
-                    ease: easeOut,
-                    clearProps: 'color,borderColor'
-                });
-
-                gsap.to(card.querySelectorAll('.tl-top-stock-view'), {
-                    color: '',
-                    duration: 0.3,
-                    ease: easeOut,
-                    clearProps: 'color'
-                });
-
-                gsap.to(card.querySelectorAll('.tl-top-stock-price'), {
+                gsap.to(card.querySelectorAll('.tl-top-stock-price, .tl-stock-card-price'), {
                     color: '',
                     duration: 0.3,
                     ease: easeOut,
@@ -350,6 +329,20 @@ document.addEventListener("DOMContentLoaded", () => {
                     duration: 0.3,
                     ease: easeOut,
                     clearProps: 'color,backgroundColor'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-stock-card-total'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
+                });
+
+                gsap.to(card.querySelectorAll('.tl-stock-card-total span'), {
+                    color: '',
+                    duration: 0.3,
+                    ease: easeOut,
+                    clearProps: 'color'
                 });
             });
         });

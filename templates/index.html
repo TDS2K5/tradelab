@@ -27,11 +27,9 @@ extra_head %}
 <!-- Stock Cards Grid -->
 <div class="tl-stock-grid">
   {% for stock in stocks %}
-  <div class="tl-stock-card">
+  <a href="/quote/{{ stock.stock }}" class="tl-stock-card" id="portfolio-stock-{{ loop.index }}">
     <div class="tl-stock-card-header">
-      <div class="tl-stock-card-symbol">
-        <a href="/quote/{{ stock.stock }}">{{ stock.stock | strip_suffix }}</a>
-      </div>
+      <div class="tl-stock-card-symbol">{{ stock.stock | strip_suffix }}</div>
       <div class="tl-stock-card-shares">
         Held :<br /><span style="font-size: 1.3rem; color: var(--tl-text)"
           >{{ stock.shares }}</span
@@ -47,17 +45,7 @@ extra_head %}
     <div class="tl-stock-card-chart">
       <canvas id="spark-{{ loop.index }}"></canvas>
     </div>
-
-    <div class="tl-stock-card-footer">
-      <span>1M trend</span>
-      <a
-        href="/quote/{{ stock.stock }}"
-        class="button button--stroke tl-btn-primary tl-btn-sm"
-        ><span class="button__flair"></span
-        ><span class="button__label">View</span></a
-      >
-    </div>
-  </div>
+  </a>
   {% endfor %}
 </div>
 
