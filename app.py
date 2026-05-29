@@ -248,6 +248,8 @@ def quote(symbol):
     stock = lookup(symbol)
     if not stock:
         return apology("Stock not found")
+    if stock.get("price") is None:
+        return apology("Price data unavailable for this stock")
     return render_template("quoted.html", stock=stock, value=inr(stock["price"]))
 
 
