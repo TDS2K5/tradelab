@@ -14,6 +14,12 @@ extra_head %}
     <div class="tl-stat-value" style="color: var(--tl-text)">{{ total }}</div>
   </div>
   <div class="tl-card tl-stat">
+    <div class="tl-stat-label">Total Return</div>
+    <div class="tl-stat-value" style="color: {% if profit_pct > 0 %}var(--tl-green){% elif profit_pct < 0 %}var(--tl-red){% else %}var(--tl-text){% endif %}">
+        {{ "+" if profit_pct > 0 else "" }}{{ "%.2f"|format(profit_pct) }}%
+    </div>
+  </div>
+  <div class="tl-card tl-stat">
     <div class="tl-stat-label">Cash Balance</div>
     <div class="tl-stat-value">{{ cash }}</div>
   </div>
