@@ -33,9 +33,10 @@ def after_request(response):
 
 
 @app.route("/")
-@login_required
 def index():
-    """Show portfolio of stocks"""
+    """Show portfolio of stocks (logged in) or landing page (logged out)."""
+    if session.get("user_id") is None:
+        return render_template("landing.html")
     all_stocks = []
     stocks = db.execute(
         "SELECT stock, shares FROM portfolio where user_id = ?", session["user_id"])

@@ -52,6 +52,8 @@
         </svg>
       </button>
       <div class="tl-mobile-brand">
+        <img src="/static/tl-dark.png" alt="TradeLab Logo" class="tl-brand-logo tl-brand-logo-dark">
+        <img src="/static/tl-light.png" alt="TradeLab Logo" class="tl-brand-logo tl-brand-logo-light">
         <span class="brand-trade">Trade</span><span class="brand-lab">Lab</span>
       </div>
     </div>
@@ -62,10 +64,13 @@
     <!-- Sidebar Navigation -->
     <nav class="tl-sidebar" id="sidebar">
       <div class="tl-sidebar-brand">
-        <a href="/"
-          ><span class="brand-trade">Trade</span
-          ><span class="brand-lab">Lab</span></a
-        >
+        <a href="/">
+          <img src="/static/tl-dark.png" alt="TradeLab Logo" class="tl-brand-logo tl-brand-logo-dark">
+          <img src="/static/tl-light.png" alt="TradeLab Logo" class="tl-brand-logo tl-brand-logo-light">
+          <span class="brand-text-container">
+            <span class="brand-trade">Trade</span><span class="brand-lab">Lab</span>
+          </span>
+        </a>
       </div>
 
       {% if session["user_id"] %}
@@ -222,6 +227,29 @@
       </div>
       {% else %}
       <ul class="tl-sidebar-nav">
+        <li>
+          <a
+            href="/"
+            class="{{ 'active' if request.path == '/' else '' }}"
+          >
+            <span class="button__flair"></span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              style="flex-shrink: 0"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+              />
+            </svg>
+            <span class="button__label">Home</span>
+          </a>
+        </li>
         <li>
           <a
             href="/register"

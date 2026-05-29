@@ -62,37 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     initButtonFlairs();
 
-    // 3. Magnetic Hover System (for links, cards, icons, nav items)
-    // Avoid magnetic effect on mobile where hover doesn't make sense
-    if (window.matchMedia("(hover: hover)").matches) {
-        const magneticElements = document.querySelectorAll('a:not(.button):not(.tl-sidebar-nav a):not(.tl-sidebar-footer a):not(.tl-top-stock-card):not(.tl-stock-card), .hover-target');
 
-        magneticElements.forEach(el => {
-            el.addEventListener('mousemove', (e) => {
-                const rect = el.getBoundingClientRect();
-                const x = e.clientX - rect.left - rect.width / 2;
-                const y = e.clientY - rect.top - rect.height / 2;
-
-                // Subtle x/y translation towards the mouse
-                gsap.to(el, {
-                    x: x * 0.15,
-                    y: y * 0.15,
-                    duration: 0.4,
-                    ease: easeOut
-                });
-            });
-
-            el.addEventListener('mouseleave', () => {
-                // Reset translation
-                gsap.to(el, {
-                    x: 0,
-                    y: 0,
-                    duration: 0.6,
-                    ease: "elastic.out(1, 0.3)" // soft magnetic release
-                });
-            });
-        });
-    }
 
     // 5. MacOS Dock-style Hover System for Navbar (Vertical)
     const navDock = document.querySelector('.tl-sidebar');
