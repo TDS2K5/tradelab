@@ -105,6 +105,7 @@ def get_historical_data(symbol, start_date=None, end_date=None, period="1y"):
         else:
             historical_data = stock.history(period=period)
 
+        historical_data = historical_data.dropna()
         if historical_data.empty:
             return None
 
