@@ -3,24 +3,24 @@
     --tl-surface: #1A1A1A;
     --tl-surface-2: #242424;
     --tl-surface-3: #2E2E2E;
-    --tl-border: #3A3A3A;
-    --tl-border-bright: #525252;
+    --tl-border: #ffffffd8;
+    --tl-border-bright: #ffffff;
     --tl-text: #F5F5F5;
-    --tl-text-muted: #B0B0B0;
-    --tl-text-dim: #858585;
-    --tl-purple: #7B8AF9;
-    --tl-purple-dim: rgba(123, 138, 249, 0.14);
-    --tl-purple-glow: rgba(123, 138, 249, 0.28);
-    --tl-yellow: #FACC15;
+    --tl-text-muted: #ffffff;
+    --tl-text-dim: #ffffffe6;
+    --tl-purple: #00eeffec;
+    --tl-purple-dim: rgba(123, 171, 249, 0.14);
+    --tl-purple-glow: rgba(123, 238, 249, 0.28);
+    --tl-yellow: #2cfa15;
     --tl-yellow-dim: rgba(250, 204, 21, 0.10);
-    --tl-red: #F87171;
+    --tl-red: #ff0000;
     --tl-red-dim: rgba(248, 113, 113, 0.12);
     --tl-green: #4ADE80;
     --tl-green-dim: rgba(74, 222, 128, 0.12);
     --tl-font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --tl-font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
     --sidebar-w: 260px;
-    --tl-focus-ring: rgba(123, 138, 249, 0.6);
+    /* --tl-focus-ring: rgba(255, 0, 0, 0.6); */
 }
 
 /* --- Light Mode Overrides --- */
@@ -34,7 +34,7 @@
     --tl-text: #000000;
     --tl-text-muted: #000000;
     --tl-text-dim: #000000;
-    --tl-purple: #4752C4;
+    --tl-purple: #00a2ff;
     --tl-purple-dim: rgba(71, 82, 196, 0.1);
     --tl-purple-glow: rgba(71, 82, 196, 0.25);
     --tl-yellow: #000000;
@@ -43,7 +43,7 @@
     --tl-red-dim: rgba(220, 38, 38, 0.08);
     --tl-green: #16A34A;
     --tl-green-dim: rgba(22, 163, 74, 0.08);
-    --tl-focus-ring: rgba(71, 82, 196, 0.5);
+    /* --tl-focus-ring: rgba(71, 82, 196, 0.5); */
 }
 
 /* --- Reset & Base --- */
@@ -470,7 +470,7 @@ small,
     font-family: var(--tl-font-mono);
     font-size: 1.35rem;
     font-weight: 600;
-    color: var(--tl-text);
+    color: var(--tl-font);
 }
 
 /* --- Bentogrid (Dashboard Layout) --- */
@@ -1270,15 +1270,14 @@ small,
     font-family: var(--tl-font-mono);
     font-weight: 700;
     font-size: 1rem;
-    color: var(--tl-yellow);
-    letter-spacing: 0.02em;
+    color: var(--tl-text);
 }
 
 .tl-stock-card-shares {
     font-family: var(--tl-font-mono);
     font-size: 1rem;
     font-weight: 700;
-    color: var(--tl-text-muted);
+    color: var(--tl-text);
     text-transform: uppercase;
     text-align: right;
 }
@@ -1295,11 +1294,11 @@ small,
     padding: 0.15rem 1rem 0;
     font-family: var(--tl-font-mono);
     font-size: 0.75rem;
-    color: var(--tl-text-muted);
+    color: var(--tl-text);
 }
 
 .tl-stock-card-total span {
-    color: var(--tl-yellow);
+    color: var(--tl-text);
     font-weight: 600;
 }
 

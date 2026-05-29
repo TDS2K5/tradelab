@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ySet(e.clientY - rect.top);
 
                 const currentIsLight = document.documentElement.getAttribute('data-theme') === 'light';
-                const bgFill = currentIsLight ? '#000000' : '#7e0000ff';
+                const bgFill = currentIsLight ? '#000000' : '#000d7e70';
                 const textOnFill = '#FFFFFF';
 
                 flairInner.style.backgroundColor = bgFill;
