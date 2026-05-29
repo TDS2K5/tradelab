@@ -220,7 +220,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 ySet(e.clientY - rect.top);
 
                 const currentIsLight = document.documentElement.getAttribute('data-theme') === 'light';
-                const bgFill = currentIsLight ? '#000000' : cs.getPropertyValue('--tl-purple').trim();
+                const bgFill = currentIsLight ? '#000000' : '#7e0000ff';
                 const textOnFill = '#FFFFFF';
 
                 flairInner.style.backgroundColor = bgFill;
@@ -240,7 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 gsap.to(card.querySelectorAll('.tl-top-stock-symbol, .tl-stock-card-symbol'), {
-                    color: '#FACC15',
+                    color: '#FFFFFF',
                     duration: 0.3,
                     ease: easeOut
                 });
@@ -271,7 +271,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 gsap.to(card.querySelectorAll('.tl-stock-card-total span'), {
-                    color: '#FACC15',
+                    color: '#ffffffff',
                     duration: 0.3,
                     ease: easeOut
                 });
