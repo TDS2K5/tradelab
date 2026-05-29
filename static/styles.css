@@ -17,8 +17,8 @@
     --tl-red-dim: rgba(248, 113, 113, 0.12);
     --tl-green: #4ADE80;
     --tl-green-dim: rgba(74, 222, 128, 0.12);
-    --tl-font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    --tl-font-mono: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    --tl-font-body: 'Lexend', sans-serif;
+    --tl-font-mono: 'Signika', sans-serif;
     --sidebar-w: 260px;
     /* --tl-focus-ring: rgba(255, 0, 0, 0.6); */
 }
@@ -260,6 +260,10 @@ small,
 
 .tl-sidebar:hover .brand-text-container {
     opacity: 1;
+}
+
+.brand-trade, .brand-lab {
+    font-family: 'Orbitron', sans-serif;
 }
 
 .tl-sidebar-brand .brand-trade {
