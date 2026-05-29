@@ -221,6 +221,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const currentIsLight = document.documentElement.getAttribute('data-theme') === 'light';
                 const bgFill = currentIsLight ? '#000000' : '#000d7e70';
+                const borderHoverColor = currentIsLight ? '#000000' : 'var(--tl-border-bright)';
                 const textOnFill = '#FFFFFF';
 
                 flairInner.style.backgroundColor = bgFill;
@@ -233,7 +234,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 gsap.to(card, {
-                    borderColor: bgFill,
+                    borderColor: borderHoverColor,
                     duration: 0.3,
                     ease: easeOut,
                     overwrite: 'auto'

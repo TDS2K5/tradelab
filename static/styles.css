@@ -996,6 +996,25 @@ small,
     border-color: var(--tl-purple);
 }
 
+/* Specific Dark Mode Period Button Theme */
+:root:not([data-theme="light"]) .tl-period-btn {
+    background: #ffffff;
+    color: #000000;
+    border-color: #ffffff;
+}
+
+:root:not([data-theme="light"]) .tl-period-btn:hover {
+    background: #f0f0f0;
+    color: #000000;
+    border-color: #f0f0f0;
+}
+
+:root:not([data-theme="light"]) .tl-period-btn.active {
+    background: #000000;
+    color: #ffffff;
+    border-color: var(--tl-border-bright);
+}
+
 /* Chart Container */
 .tl-chart-wrap {
     position: relative;
