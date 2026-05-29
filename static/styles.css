@@ -773,13 +773,14 @@ small,
     .tl-quote-grid {
         grid-template-columns: 1fr 360px;
         align-items: start;
+        gap: 2rem;
     }
 }
 
 .tl-quote-right {
     display: flex;
     flex-direction: column;
-    gap: 1px;
+    gap: 1.5rem;
 }
 
 .tl-price-large {
