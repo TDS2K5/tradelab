@@ -48,16 +48,7 @@
             <p class="tl-summary">{{ stock.summary }}</p>
             {% endif %}
 
-            {% if stock.officers %}
-            <hr class="tl-divider">
-            <h4>Key People</h4>
-            {% for officer in stock.officers[:5] %}
-            <div class="tl-officer">
-                <div class="tl-officer-name">{{ officer.name }}</div>
-                <div class="tl-officer-title">{{ officer.title }}</div>
-            </div>
-            {% endfor %}
-            {% endif %}
+
         </div>
 
         <!-- Right: Trade + Chart -->
