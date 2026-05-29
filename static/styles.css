@@ -1688,19 +1688,23 @@ small,
 /* Hero */
 .tl-landing-hero {
     padding: 4rem 0 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 
 .tl-landing-logo {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
 }
 
 .tl-landing-logo .tl-brand-logo {
-    height: 160px;
+    height: 400px;
 }
 
 /* Mobile brand logo */
 .tl-mobile-brand .tl-brand-logo {
-    height: 28px;
+    height: 30px;
 }
 
 .tl-landing-title {
@@ -1721,13 +1725,14 @@ small,
     line-height: 1.7;
     color: var(--tl-text-muted);
     max-width: 520px;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 
 .tl-landing-cta {
     display: flex;
-    gap: 0.5rem;
+    gap: 1rem;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .tl-landing-btn {
