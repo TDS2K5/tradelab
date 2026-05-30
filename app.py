@@ -99,7 +99,7 @@ def index():
     cash = float(cash_row[0]["cash"]) if cash_row else 0.0
     # total_worth = total_price + cash
     total_worth = total_price
-    profit_pct = ((total_worth - 10000.0) / 10000.0) * 10
+    profit_pct = ((total_worth - 10000.0) / 10000.0) * 10 if total_worth > 0 else 0.0
     
     return render_template("index.html", stocks=all_stocks, cash=inr(cash), total=inr(total_worth), profit_pct=profit_pct)
 
