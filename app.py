@@ -10,7 +10,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import firebase_admin
 from firebase_admin import credentials, auth as firebase_auth
 
-from helpers import apology, login_required, lookup, inr, search_stocks, get_historical_data, get_top_gainers
+from helpers import apology, login_required, lookup, inr, search_stocks, get_historical_data, get_top_gainers, get_top_weekly_stocks
 from db import SQL
 
 # Configure application
@@ -364,6 +364,13 @@ def api_top_gainers():
     """Return top monthly gainers as JSON (loaded async by the search page)."""
     gainers = get_top_gainers()
     return jsonify(gainers)
+
+@app.route("/api/top-weekly")
+@login_required
+def api_top_weekly():
+    """Return top weekly gainers as JSON (loaded async by the search page)."""
+    weekly = get_top_weekly_stocks()
+    return jsonify(weekly)
 
 @app.route("/search/<query>")
 @login_required

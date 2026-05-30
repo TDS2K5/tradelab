@@ -44,6 +44,28 @@
         <p class="tl-top-stocks-sub" style="color: var(--tl-text-muted);">Loading top gainers…</p>
     </div>
 
+    <!-- Top Weekly Gainers — loaded asynchronously after Top Gainers -->
+    <div class="tl-top-stocks-section" id="top-weekly-section" style="display: none; margin-top: 3.5rem;">
+        <div class="tl-top-stocks-header">
+            <div>
+                <h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -3px; margin-right: 0.4rem; color: var(--tl-green);">
+                        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                        <polyline points="16 7 22 7 22 13"></polyline>
+                    </svg>
+                    Top 5 NSE Stocks This Week
+                </h3>
+                <p class="tl-top-stocks-sub">Best performing Nifty 50 stocks over the last 5 trading days</p>
+            </div>
+        </div>
+        <div class="tl-top-stocks-grid" id="top-weekly-grid"></div>
+    </div>
+
+    <!-- Weekly Loading indicator — only shown after top-gainers has finished loading -->
+    <div id="top-weekly-loading" class="tl-top-stocks-section" style="display: none; text-align: center; padding: 2rem 0; margin-top: 3.5rem;">
+        <p class="tl-top-stocks-sub" style="color: var(--tl-text-muted);">Loading weekly top performers…</p>
+    </div>
+
     <script>
     (function () {
         var section = document.getElementById('top-gainers-section');
@@ -54,11 +76,132 @@
             return s.replace('.NS', '').replace('.BO', '');
         }
 
+        function loadWeeklyStocks() {
+            var weeklySection = document.getElementById('top-weekly-section');
+            var weeklyGrid = document.getElementById('top-weekly-grid');
+            var weeklyLoading = document.getElementById('top-weekly-loading');
+
+            weeklyLoading.style.display = '';
+
+            fetch('/api/top-weekly')
+                .then(function (r) { return r.json(); })
+                .then(function (weeklyStocks) {
+                    weeklyLoading.style.display = 'none';
+                    if (!weeklyStocks || weeklyStocks.length === 0) {
+                        return;
+                    }
+
+                    // Build cards
+                    weeklyStocks.forEach(function (w, i) {
+                        var idx = i + 1;
+                        var isUp = w.change_pct >= 0;
+                        var changeClass = isUp ? 'tl-top-stock-up' : 'tl-top-stock-down';
+                        var arrowSvg = isUp
+                            ? '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>'
+                            : '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>';
+
+                        var card = document.createElement('a');
+                        card.href = '/quote/' + w.symbol;
+                        card.className = 'tl-top-stock-card';
+                        card.id = 'weekly-stock-' + idx;
+                        card.innerHTML =
+                            '<div class="tl-top-stock-header">' +
+                                '<div class="tl-top-stock-info">' +
+                                    '<div class="tl-top-stock-symbol">' + stripSuffix(w.symbol) + '</div>' +
+                                    '<div class="tl-top-stock-name">' + w.name + '</div>' +
+                                '</div>' +
+                                '<div class="tl-top-stock-change ' + changeClass + '">' +
+                                    arrowSvg + ' ' + w.change_pct.toFixed(2) + '%' +
+                                '</div>' +
+                            '</div>' +
+                            '<div class="tl-top-stock-price">₹' + w.price.toFixed(2) + '</div>' +
+                            '<div class="tl-top-stock-chart">' +
+                                '<canvas id="weekly-spark-' + idx + '"></canvas>' +
+                            '</div>';
+                        weeklyGrid.appendChild(card);
+                    });
+
+                    weeklySection.style.display = '';
+
+                    // Initialize GSAP hover effects on the newly created cards
+                    if (typeof gsap !== 'undefined' && window.matchMedia("(hover: hover)").matches) {
+                        if (typeof initStockCardHovers === 'function') {
+                            initStockCardHovers();
+                        }
+                    }
+
+                    // Initialize button flair on any new buttons
+                    if (typeof gsap !== 'undefined') {
+                        if (typeof initButtonFlairs === 'function') {
+                            initButtonFlairs();
+                        }
+                    }
+
+                    // Load sparklines in batch
+                    var cs = getComputedStyle(document.documentElement);
+                    var green = cs.getPropertyValue('--tl-green').trim();
+                    var red = cs.getPropertyValue('--tl-red').trim();
+                    var symbols = weeklyStocks.map(function (w) { return w.symbol; }).join(',');
+
+                    fetch('/api/sparklines?symbols=' + encodeURIComponent(symbols))
+                        .then(function (r) { return r.json(); })
+                        .then(function (allData) {
+                            weeklyStocks.forEach(function (w, i) {
+                                var canvas = document.getElementById('weekly-spark-' + (i + 1));
+                                if (!canvas) return;
+
+                                var closes = allData[w.symbol];
+                                if (!closes || closes.length < 2) {
+                                    canvas.parentElement.style.display = 'none';
+                                    return;
+                                }
+                                var isUp = closes[closes.length - 1] >= closes[0];
+                                var lineColor = isUp ? green : red;
+                                var ctx = canvas.getContext('2d');
+
+                                new Chart(ctx, {
+                                    type: 'line',
+                                    data: {
+                                        labels: closes.map(function (_, j) { return j; }),
+                                        datasets: [{
+                                            data: closes,
+                                            borderColor: lineColor,
+                                            borderWidth: 1.5,
+                                            fill: false,
+                                            tension: 0.4,
+                                            pointRadius: 0,
+                                            pointHoverRadius: 0
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+                                        scales: { x: { display: false }, y: { display: false } },
+                                        elements: { line: { borderJoinStyle: 'round' } },
+                                        animation: false
+                                    }
+                                });
+                            });
+                        })
+                        .catch(function () {
+                            weeklyStocks.forEach(function (_, i) {
+                                var canvas = document.getElementById('weekly-spark-' + (i + 1));
+                                if (canvas) canvas.parentElement.style.display = 'none';
+                            });
+                        });
+                })
+                .catch(function () {
+                    weeklyLoading.innerHTML = '<p class="tl-top-stocks-sub" style="color: var(--tl-text-dim);">Could not load weekly performers.</p>';
+                });
+        }
+
         fetch('/api/top-gainers')
             .then(function (r) { return r.json(); })
             .then(function (gainers) {
                 if (!gainers || gainers.length === 0) {
                     loading.style.display = 'none';
+                    loadWeeklyStocks();
                     return;
                 }
 
@@ -156,16 +299,19 @@
                                 }
                             });
                         });
+                        loadWeeklyStocks();
                     })
                     .catch(function () {
                         gainers.forEach(function (_, i) {
                             var canvas = document.getElementById('top-spark-' + (i + 1));
                             if (canvas) canvas.parentElement.style.display = 'none';
                         });
+                        loadWeeklyStocks();
                     });
             })
             .catch(function () {
                 loading.innerHTML = '<p class="tl-top-stocks-sub" style="color: var(--tl-text-dim);">Could not load top gainers.</p>';
+                loadWeeklyStocks();
             });
     })();
     </script>

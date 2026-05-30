@@ -244,6 +244,87 @@ def get_top_gainers():
         return []
 
 
+def get_top_weekly_stocks():
+    """Fetch top 5 weekly gaining Indian stocks from the curated watchlist (cached)."""
+    cache_key = "top_weekly"
+    cached = cache_get(cache_key, CACHE_TTL_TOP_GAINERS)
+    if cached is not None:
+        return cached
+
+    watchlist = [
+        "RELIANCE.NS", "TCS.NS", "INFY.NS", "HDFCBANK.NS", "ICICIBANK.NS",
+        "HINDUNILVR.NS", "ITC.NS", "SBIN.NS", "BHARTIARTL.NS", "KOTAKBANK.NS",
+        "LT.NS", "AXISBANK.NS", "WIPRO.NS", "HCLTECH.NS", "SUNPHARMA.NS",
+        "MARUTI.NS", "TRENT.NS", "BAJFINANCE.NS", "TITAN.NS", "NTPC.NS",
+        "POWERGRID.NS", "ONGC.NS", "TATASTEEL.NS", "JSWSTEEL.NS", "ADANIENT.NS",
+        "ADANIPORTS.NS", "ULTRACEMCO.NS", "TECHM.NS", "BAJAJFINSV.NS", "HDFCLIFE.NS",
+        "DRREDDY.NS", "CIPLA.NS", "APOLLOHOSP.NS", "TATACONSUM.NS", "COALINDIA.NS",
+    ]
+
+    name_map = {
+        "RELIANCE.NS": "Reliance Industries", "TCS.NS": "Tata Consultancy",
+        "INFY.NS": "Infosys", "HDFCBANK.NS": "HDFC Bank",
+        "ICICIBANK.NS": "ICICI Bank", "HINDUNILVR.NS": "Hindustan Unilever",
+        "ITC.NS": "ITC Limited", "SBIN.NS": "State Bank of India",
+        "BHARTIARTL.NS": "Bharti Airtel", "KOTAKBANK.NS": "Kotak Mahindra Bank",
+        "LT.NS": "Larsen & Toubro", "AXISBANK.NS": "Axis Bank",
+        "WIPRO.NS": "Wipro", "HCLTECH.NS": "HCL Technologies",
+        "SUNPHARMA.NS": "Sun Pharma", "MARUTI.NS": "Maruti Suzuki",
+        "TRENT.NS": "Trent Limited", "BAJFINANCE.NS": "Bajaj Finance",
+        "TITAN.NS": "Titan Company", "NTPC.NS": "NTPC Limited",
+        "POWERGRID.NS": "Power Grid Corp", "ONGC.NS": "ONGC",
+        "TATASTEEL.NS": "Tata Steel", "JSWSTEEL.NS": "JSW Steel",
+        "ADANIENT.NS": "Adani Enterprises", "ADANIPORTS.NS": "Adani Ports",
+        "ULTRACEMCO.NS": "UltraTech Cement", "TECHM.NS": "Tech Mahindra",
+        "BAJAJFINSV.NS": "Bajaj Finserv", "HDFCLIFE.NS": "HDFC Life",
+        "DRREDDY.NS": "Dr. Reddy's Labs", "CIPLA.NS": "Cipla",
+        "APOLLOHOSP.NS": "Apollo Hospitals", "TATACONSUM.NS": "Tata Consumer",
+        "COALINDIA.NS": "Coal India",
+    }
+
+    try:
+        import yfinance as yf
+
+        # Batch download 5d data for all symbols
+        data = yf.download(watchlist, period="5d", group_by="ticker", progress=False, threads=True)
+
+        weekly_gainers = []
+        for symbol in watchlist:
+            try:
+                if symbol in data.columns.get_level_values(0):
+                    ticker_data = data[symbol]["Close"].dropna()
+                else:
+                    continue
+
+                if len(ticker_data) < 2:
+                    continue
+
+                first_close = float(ticker_data.iloc[0])
+                last_close = float(ticker_data.iloc[-1])
+                change_pct = ((last_close - first_close) / first_close) * 100
+
+                weekly_gainers.append({
+                    "symbol": symbol,
+                    "name": name_map.get(symbol, symbol.replace(".NS", "")),
+                    "price": round(last_close, 2),
+                    "change_pct": round(change_pct, 2),
+                    "prev_close": round(first_close, 2),
+                })
+            except Exception:
+                continue
+
+        # Sort by weekly % gain descending, take top 5
+        weekly_gainers.sort(key=lambda x: x["change_pct"], reverse=True)
+        result = weekly_gainers[:5]
+        cache_set(cache_key, result)
+        return result
+
+    except Exception as e:
+        print(f"Error fetching weekly stocks: {e}")
+        return []
+
+
+
 def inr(value):
     """Format value as INR."""
     return f"₹{value:,.2f}"
