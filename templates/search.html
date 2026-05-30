@@ -143,7 +143,7 @@
                     var red = cs.getPropertyValue('--tl-red').trim();
                     var symbols = weeklyStocks.map(function (w) { return w.symbol; }).join(',');
 
-                    fetch('/api/sparklines?symbols=' + encodeURIComponent(symbols))
+                    fetch('/api/sparklines?symbols=' + encodeURIComponent(symbols) + '&period=5d')
                         .then(function (r) { return r.json(); })
                         .then(function (allData) {
                             weeklyStocks.forEach(function (w, i) {

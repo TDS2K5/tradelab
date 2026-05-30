@@ -137,17 +137,22 @@ def sparkline(symbol):
 @app.route("/api/sparklines")
 @login_required
 def sparklines_batch():
-    """Return 1-month close prices for multiple symbols in one request.
-    Usage: /api/sparklines?symbols=TCS.NS,INFY.NS,RELIANCE.NS
+    """Return close prices for multiple symbols in one request with custom period.
+    Usage: /api/sparklines?symbols=TCS.NS,INFY.NS&period=5d
     """
     symbols_param = request.args.get("symbols", "")
     symbols = [s.strip() for s in symbols_param.split(",") if s.strip()]
     if not symbols:
         return jsonify({})
 
+    period = request.args.get("period", "1mo")
+    allowed = {"5d", "1mo", "3mo", "6mo", "1y", "5y", "max"}
+    if period not in allowed:
+        period = "1mo"
+
     result = {}
     for sym in symbols:
-        data = get_historical_data(sym, period="1mo")
+        data = get_historical_data(sym, period=period)
         if data and data["records"]:
             result[sym] = [r["close"] for r in data["records"]]
         else:
