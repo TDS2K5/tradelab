@@ -384,4 +384,121 @@ document.addEventListener("DOMContentLoaded", () => {
 
     handleGoogleSignIn(document.getElementById('google-signin-btn'));
     handleGoogleSignIn(document.getElementById('google-signup-btn'));
+
+    // 9. Legacy Credentials Client-Side Validation
+    const loginForm = document.querySelector('form[action="/login"]');
+    const registerForm = document.querySelector('form[action="/register"]');
+
+    function showError(form, message) {
+        // Remove existing error message if any
+        const existingError = form.querySelector('.tl-client-error');
+        if (existingError) {
+            existingError.remove();
+        }
+
+        // Create elegant error display element using TradeLab theme
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'tl-flash tl-client-error';
+        errorDiv.style.cssText = 'border-color: var(--tl-red) !important; border-left-color: var(--tl-red) !important; margin-bottom: 1.25rem; font-weight: 500;';
+        errorDiv.textContent = message;
+
+        // Insert at the top of the form
+        form.insertBefore(errorDiv, form.firstChild);
+
+        // Subtle pop animation with GSAP
+        gsap.fromTo(errorDiv, 
+            { opacity: 0, y: -10, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.35, ease: "back.out(1.7)" }
+        );
+    }
+
+    function validateCredentials(username, password) {
+        // Bypass length constraints for 'admin/admin'
+        if (username === 'admin' && password === 'admin') {
+            return { valid: true };
+        }
+
+        if (username.length < 5) {
+            return { valid: false, message: 'Username must be at least 5 characters long.' };
+        }
+
+        if (password.length <= 6) {
+            return { valid: false, message: 'Password must be greater than 6 characters.' };
+        }
+
+        return { valid: true };
+    }
+
+    if (loginForm) {
+        loginForm.addEventListener('submit', (e) => {
+            const usernameInput = document.getElementById('login-username');
+            const passwordInput = document.getElementById('login-password');
+            if (!usernameInput || !passwordInput) return;
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            const validation = validateCredentials(username, password);
+            if (!validation.valid) {
+                e.preventDefault();
+                showError(loginForm, validation.message);
+                
+                // Animate/shake inputs slightly to grab attention
+                gsap.to([usernameInput, passwordInput], {
+                    x: (i) => i === 0 ? -6 : 6,
+                    duration: 0.08,
+                    yoyo: true,
+                    repeat: 5,
+                    onComplete: () => {
+                        gsap.set([usernameInput, passwordInput], { x: 0 });
+                    }
+                });
+            }
+        });
+    }
+
+    if (registerForm) {
+        registerForm.addEventListener('submit', (e) => {
+            const usernameInput = document.getElementById('reg-username');
+            const passwordInput = document.getElementById('reg-password');
+            const confirmInput = document.getElementById('reg-confirm');
+            if (!usernameInput || !passwordInput) return;
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value;
+
+            // First run the standard validation
+            const validation = validateCredentials(username, password);
+            if (!validation.valid) {
+                e.preventDefault();
+                showError(registerForm, validation.message);
+                
+                gsap.to([usernameInput, passwordInput], {
+                    x: (i) => i === 0 ? -6 : 6,
+                    duration: 0.08,
+                    yoyo: true,
+                    repeat: 5,
+                    onComplete: () => {
+                        gsap.set([usernameInput, passwordInput], { x: 0 });
+                    }
+                });
+                return;
+            }
+
+            // Confirm password matches check
+            if (confirmInput && password !== confirmInput.value) {
+                e.preventDefault();
+                showError(registerForm, "Passwords do not match.");
+                gsap.to([passwordInput, confirmInput], {
+                    x: (i) => i === 0 ? -6 : 6,
+                    duration: 0.08,
+                    yoyo: true,
+                    repeat: 5,
+                    onComplete: () => {
+                        gsap.set([passwordInput, confirmInput], { x: 0 });
+                    }
+                });
+            }
+        });
+    }
 });
