@@ -338,4 +338,50 @@ document.addEventListener("DOMContentLoaded", () => {
             btn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
         });
     });
+
+    // 8. Google Sign-In (Firebase)
+    function handleGoogleSignIn(btn) {
+        if (!btn || typeof firebase === 'undefined') return;
+
+        btn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+
+            // Add loading state
+            btn.disabled = true;
+            const originalText = btn.querySelector('span').textContent;
+            btn.querySelector('span').textContent = 'Signing in...';
+
+            firebase.auth().signInWithPopup(provider)
+                .then(result => result.user.getIdToken())
+                .then(idToken => {
+                    return fetch('/google-login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken })
+                    });
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/';
+                    } else {
+                        alert(data.error || 'Google sign-in failed');
+                        btn.disabled = false;
+                        btn.querySelector('span').textContent = originalText;
+                    }
+                })
+                .catch(err => {
+                    console.error('Google sign-in error:', err);
+                    // Don't alert on user-cancelled popup
+                    if (err.code !== 'auth/popup-closed-by-user') {
+                        alert('Google sign-in failed. Please try again.');
+                    }
+                    btn.disabled = false;
+                    btn.querySelector('span').textContent = originalText;
+                });
+        });
+    }
+
+    handleGoogleSignIn(document.getElementById('google-signin-btn'));
+    handleGoogleSignIn(document.getElementById('google-signup-btn'));
 });

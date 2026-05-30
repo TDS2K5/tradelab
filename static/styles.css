@@ -764,6 +764,67 @@ small,
     margin-bottom: 1.5rem;
 }
 
+/* --- Auth Divider (OR separator) --- */
+.tl-auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.25rem 0;
+}
+
+.tl-auth-divider::before,
+.tl-auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--tl-border);
+}
+
+.tl-auth-divider span {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--tl-text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+/* --- Google Sign-In Button --- */
+.tl-google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.7rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--tl-font-body);
+    color: var(--tl-text);
+    background: var(--tl-surface-2);
+    border: 2px solid var(--tl-border);
+    border-radius: 6.25rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.1s ease;
+}
+
+.tl-google-btn:hover {
+    border-color: var(--tl-border-bright);
+    background: var(--tl-surface-3);
+}
+
+.tl-google-btn:active {
+    transform: scale(0.98);
+}
+
+.tl-google-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.tl-google-btn svg {
+    flex-shrink: 0;
+}
+
 /* --- Badges --- */
 .tl-badge {
     display: inline-block;

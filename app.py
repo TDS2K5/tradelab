@@ -4,6 +4,9 @@ from flask import Flask, flash, jsonify, redirect, render_template, request, ses
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 
+import firebase_admin
+from firebase_admin import credentials, auth as firebase_auth
+
 from helpers import apology, login_required, lookup, inr, search_stocks, get_historical_data, get_top_gainers
 from db import SQL
 
@@ -21,6 +24,15 @@ Session(app)
 
 # Configure DB wrapper
 db = SQL("finance.db")
+
+# Initialize Firebase Admin SDK
+_firebase_cred_path = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
+if os.path.exists(_firebase_cred_path):
+    cred = credentials.Certificate(_firebase_cred_path)
+    firebase_admin.initialize_app(cred)
+else:
+    print("WARNING: serviceAccountKey.json not found — Google sign-in will not work.")
+    print("Download it from Firebase Console → Project Settings → Service Accounts")
 
 
 @app.after_request
@@ -242,6 +254,42 @@ def logout():
 
     # Redirect user to login form
     return redirect("/")
+
+
+@app.route("/google-login", methods=["POST"])
+def google_login():
+    """Handle Google sign-in via Firebase ID token."""
+    data = request.get_json()
+    id_token = data.get("idToken") if data else None
+
+    if not id_token:
+        return jsonify({"error": "Missing ID token"}), 400
+
+    try:
+        # Verify the Firebase ID token
+        decoded = firebase_auth.verify_id_token(id_token)
+        google_uid = decoded["uid"]
+        google_email = decoded.get("email", google_uid)
+
+        # Check if this Google user already exists in our DB
+        user = db.execute("SELECT * FROM users WHERE username = ?", google_uid)
+
+        if not user:
+            # First-time Google user — create a row with a placeholder hash
+            db.execute(
+                "INSERT INTO users (username, hash) VALUES (?, ?)",
+                google_uid, "GOOGLE_AUTH"
+            )
+            user = db.execute("SELECT * FROM users WHERE username = ?", google_uid)
+
+        # Set Flask session
+        session["user_id"] = user[0]["id"]
+
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print(f"Google login error: {e}")
+        return jsonify({"error": "Authentication failed"}), 401
 
 
 @app.route("/quote/<symbol>")
