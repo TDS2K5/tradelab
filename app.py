@@ -25,8 +25,9 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-# Configure DB wrapper
-db = SQL("finance.db")
+# Configure DB wrapper with absolute path to prevent working directory issues in production
+db_path = os.path.join(os.path.dirname(__file__), "finance.db")
+db = SQL(db_path)
 
 # Initialize Firebase Admin SDK
 _firebase_cred_path = os.path.join(os.path.dirname(__file__), "serviceAccountKey.json")
