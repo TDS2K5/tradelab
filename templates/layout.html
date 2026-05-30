@@ -1,12 +1,16 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <link id="favicon" href="/static/tl-light.png" rel="icon" type="image/png" />
     <script>
       // Apply theme before CSS paints — prevents flash of wrong theme
       (function () {
         var t = localStorage.getItem("tl-theme");
-        if (t === "light")
+        if (t === "light") {
           document.documentElement.setAttribute("data-theme", "light");
+          var fav = document.getElementById("favicon");
+          if (fav) fav.href = "/static/tl-dark.png";
+        }
       })();
     </script>
     <meta charset="utf-8" />
@@ -15,9 +19,6 @@
       name="description"
       content="TradeLab — Track, buy, and sell Indian stocks with real-time quotes and the historical data."
     />
-
-    <!-- https://favicon.io/emoji-favicons/money-bag/ -->
-    <link href="/static/favicon.ico" rel="icon" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -342,9 +343,21 @@
     <!-- Theme persistence & toggle script -->
     <script>
       (function () {
+        const favicon = document.getElementById("favicon");
+        function updateFavicon(theme) {
+          if (favicon) {
+            favicon.href = theme === "light" ? "/static/tl-dark.png" : "/static/tl-light.png";
+          }
+        }
+
         // Apply saved theme immediately
         const saved = localStorage.getItem("tl-theme");
-        if (saved) document.documentElement.setAttribute("data-theme", saved);
+        if (saved) {
+          document.documentElement.setAttribute("data-theme", saved);
+          updateFavicon(saved);
+        } else {
+          updateFavicon("dark");
+        }
 
         // Toggle button
         const btn = document.getElementById("theme-toggle");
@@ -362,9 +375,11 @@
             if (isLight) {
               document.documentElement.removeAttribute("data-theme");
               localStorage.setItem("tl-theme", "dark");
+              updateFavicon("dark");
             } else {
               document.documentElement.setAttribute("data-theme", "light");
               localStorage.setItem("tl-theme", "light");
+              updateFavicon("light");
             }
             updateLabel();
           });
