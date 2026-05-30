@@ -5,3 +5,5 @@ requests
 yfinance
 growwapi
 pandas
+python-dotenv
+firebase-admin

@@ -378,12 +378,12 @@
     <script>
       // Initialize Firebase
       const firebaseConfig = {
-        apiKey: "AIzaSyAgmckT3ufySkklb459XDmQm8tOcZSu7TY",
-        authDomain: "tradelab-c051f.firebaseapp.com",
-        projectId: "tradelab-c051f",
-        storageBucket: "tradelab-c051f.firebasestorage.app",
-        messagingSenderId: "297524972447",
-        appId: "1:297524972447:web:2630b5a8145f18c59b8baa"
+        apiKey: "{{ firebase_config.apiKey }}",
+        authDomain: "{{ firebase_config.authDomain }}",
+        projectId: "{{ firebase_config.projectId }}",
+        storageBucket: "{{ firebase_config.storageBucket }}",
+        messagingSenderId: "{{ firebase_config.messagingSenderId }}",
+        appId: "{{ firebase_config.appId }}"
       };
       firebase.initializeApp(firebaseConfig);
     </script>

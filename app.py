@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()  # Load .env before anything else
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
@@ -33,6 +36,21 @@ if os.path.exists(_firebase_cred_path):
 else:
     print("WARNING: serviceAccountKey.json not found — Google sign-in will not work.")
     print("Download it from Firebase Console → Project Settings → Service Accounts")
+
+
+@app.context_processor
+def inject_firebase_config():
+    """Make Firebase client-side config available in every template."""
+    return {
+        "firebase_config": {
+            "apiKey": os.environ.get("FIREBASE_API_KEY", ""),
+            "authDomain": os.environ.get("FIREBASE_AUTH_DOMAIN", ""),
+            "projectId": os.environ.get("FIREBASE_PROJECT_ID", ""),
+            "storageBucket": os.environ.get("FIREBASE_STORAGE_BUCKET", ""),
+            "messagingSenderId": os.environ.get("FIREBASE_MESSAGING_SENDER_ID", ""),
+            "appId": os.environ.get("FIREBASE_APP_ID", ""),
+        }
+    }
 
 
 @app.after_request
